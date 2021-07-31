@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load mathfilters %}
+{% block body %}
+
+<div class="col-lg-12 mt-3">
+    <div class="card">
+        <!-- basic Bill Information Start -->
+        <div class="card-header">
+            <span class="float-left dont-print">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </span>
+            <i class="fa fa-list-alt"></i>
+            بيانات الفاتورة
+            <table class="table table-borderless mt-3" >
+                <tfoot>
+                    <tr>
+                    <td>رقم الطلب</td>
+                    <td >{{ order.id }}</td>
+                    <td>تاريخ و وقت الطلب</td>
+                    <td>{{ order.date }}</td>
+                    <td>كاشير رقم</td>
+                    <td>{{ order.shift.cashier_no }}</td>
+                    </tr>
+                    <tr>
+                        <td>اسم العميل</td>
+                        <td>{{ order.customer }}</td>
+                        <td>اسم الموظف</td>
+                        <td>{{ order.shift.employee.name }}</td>
+                        {% if order.pos.type == 1 and order.table != None %}
+                            <td>طاولة رقم </td>
+                            <td>{{ order.table }}</td>
+                        {% endif %}
+                    </tr>
+                </tfoot>
+            </table>
+    
+        </div>
+        <!-- basic Bill Information End -->
+
+        <div class="card-body table-responsive">
+            <!-- Products Information Start -->
+            <table class="table table-hover">
+                <thead>
+                    <th>اسم المنتج</th>
+                    <th class="text-center"> الكمية</th>
+                    <th class="text-center">سعر المنتج</th>
+                    <th class="text-center">الإجمالي</th>
+                </thead>
+            <tbody>
+            {% for x in order_items %}
+                <tr>
+                    <td>{{ x.product.name }}</td>
+                    <td class="text-center">{{ x.quantity }}</td>
+                    <td class="text-center">{{ x.price }}</td>
+                    <td class="text-center">{{ x.sub_total }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        
+            </table>
+            <!-- Products Information End -->
+
+            <hr>
+
+            <!-- Total Information Start -->
+            <table class="table table-borderless" style="width: 30%;">
+                <tfoot>
+                    {% if order.discount_value != 0 %}
+                        <tr>
+                            <td>الخصم</td>
+                            <td >{{ order.discount_value }}</td>
+                        </tr>
+                        <tr>
+                            <td>الإجمالي بعد الخصم</td>
+                            <td>{{ order.total|sub:order.discount_value }}</td>
+                        </tr>
+                        {% if order.delivery_cost > 0 %}
+                            <tr>
+                                <td>تكلفة التوصيل</td>
+                                <td>{{ order.delivery_cost }}</td>
+                            </tr>
+                            <tr>
+                                <td> الإجمالي</td>
+                                <td>{{ order.total|add:order.taxes|add:order.delivery_cost|sub:order.discount_value }}</td>
+                            </tr>
+                        {% endif %}
+                    {% else %}
+                        {% if order.delivery_cost > 0 %}
+                            <tr>
+                                <td>تكلفة التوصيل</td>
+                                <td>{{ order.delivery_cost }}</td>
+                            </tr>
+                            <tr>
+                                <td> الإجمالي</td>
+                                <td>{{ order.total|add:order.taxes|add:order.delivery_cost|sub:order.discount_value }}</td>
+                            </tr>
+                        {% else %}
+                        <tr>
+                            <td>الإجمالي</td>
+                            <td>{{ order.total }}</td>
+                        </tr>
+                        {% endif %}
+                        
+                    {% endif %}
+                    <tr>
+                        <td>المدفوع</th>
+                        <td>{{ order.total_paid }}</td>
+                    </tr>
+
+                
+                </tfoot>
+            </table>
+            <!-- Total Information End -->
+
+            <!-- Print Start -->
+            <div class="col-lg-12 dont-print">
+                <a href="{% url 'POS:print' order.id %}"
+                    class="btn btn-block btn-success dont-print">
+                    <i class="fa fa-print"></i>
+                </a>
+            </div>
+            <!-- Print End -->
+            <!-- Back to POS Start -->
+            <div class="col-lg-12 dont-print mt-3">
+                <a href="{% url 'POS:POSCard' order.pos.id %}"
+                    class="btn btn-block btn-info dont-print">
+                    الرجوع لنقطة البيع
+                </a>
+            </div>
+            <!-- Back to POS End -->
+        </div> 
+        
+    </div> 
+</div>
+
+{% endblock %}

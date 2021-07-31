@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12 dont-print">
+        <div class="card">
+            <div class="card-header">
+                <h3>   تقارير العملاء الأكثر مبيعاَ
+                </h3>
+              </div>
+            <div class="card-body">
+                <form class="form-horizontal" method="get" action="#">
+                    <input name="type" type="hidden" value="{{ request.GET.type }}">
+                    <h5> من تاريخ : </h5>
+                    <input type="date" name="from_date" required>
+                    <h5> الى تاريخ : </h5>
+                    <input type="date" name="to_date" required>
+                    <h5> تصنيف حسب : </h5>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input ml-1" type="radio" name="option" id="inlineRadio1" value="1"  style="height:1.1em; width:1.1em;" required>
+                        <label class="form-check-label" for="inlineRadio1">عدد طلبات المبيعات</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input ml-1" type="radio" name="option" id="inlineRadio2" value="2" style="height:1.1em; width:1.1em;" required>
+                        <label class="form-check-label" for="inlineRadio2">قيمة المبيعات</label>
+                    </div>
+                    <button name="submit" class="btn btn-success btn-block mt-1" type="submit" value="1"><i
+                            class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <td>#</td>
+            <td>اسم العميل</td>
+            <td>الشريحة</td>
+            <td> عدد المبيعات</td>
+            <td>قيمة المبيعات</td>
+            </thead>
+            <tbody>
+            {% for x in invoice %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><a href="">{{ x.1 }}</a></td>
+                    <td>{{ x.2 }}</td>
+                    <td>{{ x.3 }}</td>
+                    <td>{{ x.4 }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

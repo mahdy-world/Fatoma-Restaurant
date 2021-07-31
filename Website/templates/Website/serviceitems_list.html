@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        {% if perms.Branches.add_branch %}
+        <a href="{% url 'Website:ServiceItemsCreate' %}" class="btn btn-success btn-block" data-toggle="modal"
+           data-target="#sub_modal">
+            <i class="fa fa-plus-circle"></i>
+            إضافة
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-th-list"></i>
+                خدماتنا
+
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>#</td>
+                            <td>العنوان</td>
+                            <td>الوصف</td>
+                            <td>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <form method="get" action="#">
+                                <td>
+                                    <input type="number" class="form-control input-xs" name="id">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="title">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="description">
+                                </td>
+                                <td>
+                                    <button class="btn btn-block btn-xs bg-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                        {% for x in object_list %}
+                            <tr>
+                                <td>{{ x.id }}</td>
+                                <td>{{ x.title }}</td>
+                                <td>{{ x.description }}</td>
+                                <td>
+                                    {% if perms.Branches.edit_branch %}
+                                    <a href="{% url 'Website:ServiceItemsUpdate' x.id %}" class="btn-sm btn-info"
+                                       title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if perms.Branches.delete_branch %}
+                                    <a href="{% url 'Website:ServiceItemsDelete' x.id %}" class="btn-sm btn-danger"
+                                       title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if is_paginated %}
+                <div class="card-footer">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&laquo;</span></li>
+                            {% endif %}
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="active page-item"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

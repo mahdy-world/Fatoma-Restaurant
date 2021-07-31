@@ -1,0 +1,20 @@
+{% extends 'Website/base.html' %}
+
+{% block body %}
+    {% for x in main_categories %}
+        <div class="col-lg-3 col-md-3 col-sm-6 align-items-stretch">
+            <div class="card">
+                <div class="card-body">
+                    {% if x.image %}
+                        <img src="{{ x.image.url }}" style="width:100%;">
+                    {% else %}
+                        <i class="fa fa-5x fa-th"></i>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-primary">
+                    {{ x.name }}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

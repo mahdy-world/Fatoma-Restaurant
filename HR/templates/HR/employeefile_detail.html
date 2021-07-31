@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        img {
+            max-width: 100%;
+        }
+
+        #attachments {
+            align-items: center;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div id="attachments">
+    <a href="{{ object.file.url }}" target="_blank">
+        <img src="{{ object.file.url }}" class="img-responsive">
+    </a>
+    </div>
+{% endblock %}

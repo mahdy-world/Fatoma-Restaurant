@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}ONERP{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ONERP.css' %}">
+    <style>
+    </style>
+    {% block head %}
+
+    {% endblock %}
+</head>
+<body dir="rtl">
+{% block navbar %}
+    {% include 'Core/navbar.html' %}
+{% endblock %}
+{% if request.user.id != 0 or not expired %}
+    <div class="container{% block container_class %}{% endblock %}">
+        <div class="row center-text">
+            {% if request.user.is_staff %}
+                {% if messages %}
+                    <div class="col-lg-12">
+                        {% for message in messages %}
+                            <div{% if message.tags %}
+                                class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% block body %}
+
+                {% endblock %}
+            {% else %}
+                {% block public_body %}
+                    <div class="login-container">
+                        <label class="alert alert-danger">
+                            عفواً لا يمكنك الدخول لهذه الصفحة
+                            برجاء تسجيل الدخول من
+                            <a href="{% url 'Auth:login' %}">هنا</a>
+                        </label>
+                    </div>
+                {% endblock %}
+            {% endif %}
+        </div>
+    </div>
+    {% block modal %}
+        <div class="modal fade" id="action_modal">
+            <div class="modal-dialog modal-full">
+                <div class="modal-content">
+                    <span class="float-left">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </span>
+                    <div class="modal-body" id="action_body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="sub_modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <span class="float-left">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </span>
+                    <div class="modal-body" id="sub_body">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+{% else %}
+    <div class="alert alert-danger center-text">
+        {% if license_expiration < today %}
+            تم إنتهاء ترخيص استخدام البرنامج
+            <br>
+        {% endif %}
+        {% if host_expiration < today %}
+            تم إنتهاء مدة الاستضافة
+            <br>
+        {% endif %}
+        برجاء الإتصال بالمبيعات لتجديد الترخيص
+        <br>
+        <i class="fa fa-phone">
+            <a href="tel:01066440666">
+                01066440666
+            </a>
+        </i>
+    </div>
+{% endif %}
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+        -->
+{% include 'Core/btn_navbar.html' %}
+<script src="{% static 'plugins/jquery/jquery.slim.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'plugins/select2/js/select2.full.min.js' %}"></script>
+<script src="{% static 'js/ONERP.js' %}"></script>
+
+<script>
+    $('#action_modal').on('show.bs.modal', function (e) {
+        $(this).find('.modal-body').load(e.relatedTarget.href);
+    });
+    $('#sub_modal').on('show.bs.modal', function (x) {
+        $('#sub_body').load(x.relatedTarget.href);
+    });
+    $('body').on('hidden.bs.modal', function () {
+        if ($('.modal.in').length > 0) {
+            $('body').addClass('modal-open');
+        }
+    });
+</script>
+<!-- Multi Level Dropdown Menu -->
+<script>
+    /*!
+     * Bootstrap 4 multi dropdown navbar ( https://bootstrapthemes.co/demo/resource/bootstrap-4-multi-dropdown-navbar/ )
+     * Copyright 2017.
+     * Licensed under the GPL license
+     */
+
+
+    $(document).ready(function () {
+        $('.dropdown-menu a.dropdown-toggle').on('click', function (e) {
+            var $el = $(this);
+            var $parent = $(this).offsetParent(".dropdown-menu");
+            if (!$(this).next().hasClass('show')) {
+                $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+            }
+            var $subMenu = $(this).next(".dropdown-menu");
+            $subMenu.toggleClass('show');
+
+            $(this).parent("li").toggleClass('show');
+
+            $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function (e) {
+                $('.dropdown-menu .show').removeClass("show");
+            });
+
+            if (!$parent.parent().hasClass('navbar-nav')) {
+                $el.next().css({"top": $el[0].offsetTop, "left": $parent.outerWidth() - 4});
+            }
+
+            return false;
+        });
+    });
+</script>
+{% block js %}
+
+{% endblock %}
+</body>
+</html>

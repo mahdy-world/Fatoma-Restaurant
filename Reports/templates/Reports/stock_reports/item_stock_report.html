@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">تقارير رصيد مخزون منتج</div>
+            <div class="card-body">
+                <form>
+                    {{ form }}
+                    <button name="submit" class="btn btn-success" type="submit" value="1"><i
+                            class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <td>#</td>
+            <td>المنتج</td>
+            <td>المخزن</td>
+            <td>الكمية</td>
+            </thead>
+            <tbody>
+            {% for branch, item_stock in stock.items %}
+                <tr>
+                    <td></td>
+                    <td>{{ item }}</td>
+                    <td>{{ branch }}</td>
+                    <td>{{ item_stock }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

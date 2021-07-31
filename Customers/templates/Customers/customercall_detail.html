@@ -1,0 +1,14 @@
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">بيانات المكالمة</div>
+        {% include 'card-tools.html' %}
+    </div>
+    <div class="card-body">
+        <h4>{{ object.customer }} -
+            <small><i class="fa fa-user"></i> {{ object.added_by }}</small>
+        </h4>
+        <i class="fa fa-calendar"></i> {{ object.added_at.date.isoformat }}
+        <i class="fa fa-clock"></i> {{ object.added_at.time }}
+        <p>{{ object.summary }}</p>
+    </div>
+</div>

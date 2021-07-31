@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        <a href="{% url 'Products:MainCategoryCreate' %}" class="btn btn-success btn-block">
+            <i class="fa fa-plus-circle"></i>
+            إضافة
+        </a>
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-th-list"></i>
+                مجموعات الاصناف الرئيسية
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>#</td>
+                            <td>الاسم</td>
+                            <td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="number" class="form-control input-xs" name="idSearch">
+                            </td>
+                            <td>
+                                <input type="name" class="form-control input-xs" name="nameSearch">
+                            </td>
+                            <td>
+                                <button class="btn btn-block btn-xs bg-primary">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for x in object_list %}
+                            <tr>
+                                <td>{{ x.id }}</td>
+                                <td>{{ x.name }}</td>
+                                <td>
+                                    <a href="" class="btn-sm btn-info" title="تعديل">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a href="" class="btn-sm btn-danger" title="حذف">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

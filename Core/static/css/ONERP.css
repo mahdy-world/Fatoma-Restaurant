@@ -1,0 +1,165 @@
+@font-face {
+    font-family: arabic;
+    src: url(../fonts/hacen_tunisia.ttf);
+}
+
+body {
+    font-family: arabic;
+    direction: rtl;
+    text-align: right;
+    margin-bottom: 50px;
+}
+
+.select2-container {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.bg-primary {
+    background-color: #1C3144 !important;
+    color: white;
+}
+
+.center {
+    margin: auto;
+}
+
+.form-control {
+    border-radius: 20px !important;
+    background-color: transparent;
+}
+
+.login-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    padding: 15px;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.login-card {
+    background-color: rgb(28, 49, 68) !important;
+    color: white;
+    text-align: center;
+}
+
+.btn {
+    border-radius: 100px;
+}
+
+.btn-circle {
+    border-radius: 50%;
+}
+
+.btn-sm {
+    border-radius: 100px;
+}
+
+.dropdown-item {
+    text-align: right;
+}
+
+.fixed-link {
+    color: white;
+}
+
+.fixed-link:hover {
+    color: white;
+}
+
+.fixed-link:visited {
+    color: white;
+}
+
+td {
+    font-size: small;
+    white-space: nowrap;
+}
+
+textarea .form-control {
+    border-radius: 20px !important;
+    height: 30px;
+    max-height: 30px;
+}
+
+.box {
+    border-radius: 20px;
+    border: 1px solid black;
+    padding: 30px 30px 30px 30px;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.thumbnail {
+    max-height: 200px;
+    max-width: 200px;
+}
+
+.avatar {
+    border-radius: 50%;
+    max-height: 75px;
+    max-width: 75px;
+}
+
+.print-only {
+    display: none;
+}
+
+@media print {
+    .dont-print {
+        display: none;
+    }
+
+    .print-only {
+        display: inherit;
+    }
+}
+
+#action_modal {
+    overflow-y: scroll;
+}
+
+.select2-container {
+    width: 100%;
+!important;
+    min-width: 100%;
+!important;
+}
+
+.select2-container--default .select2-selection--single {
+    border: 0;
+!important;
+}
+
+.modal-full {
+    min-width: 100%;
+    margin: 0;
+}
+
+/* Multi Level Dropdown Menu */
+.navbar-light .navbar-nav .nav-link {
+    color: rgb(64, 64, 64);
+}
+
+.btco-menu li > a {
+    padding: 10px 15px;
+    color: #000;
+
+}
+
+.btco-menu .active a:focus,
+.btco-menu li a:focus,
+.navbar > .show > a:focus {
+    background: transparent;
+    outline: 0;
+}
+
+.dropdown-menu .show > .dropdown-toggle::after {
+    transform: rotate(-90deg);
+}
+
+/* End Of Multi Level Dropdown Menu */

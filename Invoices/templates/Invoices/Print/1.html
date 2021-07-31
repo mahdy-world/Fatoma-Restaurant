@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        .container {
+            font-size: {{ setting.text_size|floatformat }}px;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+
+        td {
+            font-size: {{ setting.text_size|floatformat }}px;
+        }
+
+        div.header {
+            display: block;
+            text-align: center;
+            position: running(header);
+        }
+
+        div.footer {
+            display: block;
+            text-align: center;
+            position: running(footer);
+            bottom: 0;
+        }
+
+        @page {
+            @top-center {
+                content: element(header)
+            }
+        }
+
+        @page {
+            @bottom-center {
+                content: element(footer)
+            }
+        }
+
+        td {
+            border: 1px solid black !important;
+        }
+
+        @media print {
+            td {
+                border: 1px solid black !important;
+            }
+
+            div.footer {
+                position: absolute;
+                bottom: 0;
+            }
+        }
+    </style>
+{% endblock %}
+{% block title %}
+    {% if invoice.invoice_type == 7 %}Quotation{% else %}Invoice{% endif %}-{% now "Y" %}{{ invoice.id }}
+{% endblock %}
+{% block body %}
+    <div class="header col-lg-12">
+        <div class="row">
+            <!-- Right -->
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 center-text">
+                {% if setting.logo_location == 1 %}
+                    {% if setting.logo %}
+                        <img src="{{ setting.logo.url }}" width="{{ setting.logo_width|floatformat }}%">
+                    {% else %}
+                        <h5>{{ setting.name }}</h5>
+                    {% endif %}
+                {% else %}
+                    {% if setting.footer1_location == 1 %}
+                        {% if setting.footer1 %}
+                            {{ setting.footer1|linebreaks }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+            <!-- Center -->
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 center-text">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <!--<h3 style="display: table-cell; vertical-align: middle;">-->
+                            {% if invoice.invoice_type == 1 %}
+                                {{ setting.sales_invoice_title }} {{ invoice.id }}
+                            {% else %}
+                                {{ invoice }}
+                            {% endif %}
+                    </div>
+                    <div class="col-lg-12">
+                        <img src="{% url 'Barcode:single_generator' invoice.id %}">
+                    </div>
+                </div>
+            </div>
+            <!-- Left -->
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 center-text">
+                {% if setting.logo_location == 2 %}
+                    {% if setting.logo %}
+                        <img src="{{ setting.logo.url }}" width="{{ setting.logo_width|floatformat }}%">
+                    {% else %}
+                        <h5>{{ setting.name }}</h5>
+                    {% endif %}
+                {% else %}
+                    {% if setting.footer1_location == 1 %}
+                        {% if setting.footer1 %}
+                            {{ setting.footer1|linebreaks }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <table class="table">
+            <tr>
+                <td>التاريخ</td>
+                <td>{{ invoice.date.astimezone.date.isoformat }}</td>
+            </tr>
+            <tr>
+                <td>الاسم</td>
+                <td>{{ invoice.customer }}</td>
+            </tr>
+        </table>
+        <table class="table">
+            <thead>
+            <td>#</td>
+            <td>المنتج</td>
+            <td>سعر</td>
+            <td>كمية</td>
+            <td>إجمالي</td>
+            </thead>
+            <tbody>
+            {% for item in invoice.invoiceitem_set.all %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.item }}</td>
+                    <td>{{ item.unit_price|floatformat }}</td>
+                    <td>{{ item.quantity|floatformat }}</td>
+                    <td>{{ item.total_price|floatformat }}</td>
+                </tr>
+                {% if item.comment %}
+                    <tr>
+                        <td colspan="5">{{ item.comment|linebreaks }}</td>
+                    </tr>
+                {% endif %}
+                {% if setting.print_product_description %}
+                    {% if item.item.description %}
+                        <tr>
+                            <td colspan="5">{{ item.item.description|linebreaks }}</td>
+                        </tr>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            <tr>
+                <td colspan="4">إجمالي</td>
+                <td>{{ invoice.total|floatformat }}</td>
+            </tr>
+            {% if invoice.discount %}
+                <tr>
+                    <td colspan="4">خصم</td>
+                    <td>{{ invoice.discount|floatformat }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4">بعد الخصم</td>
+                    <td>{{ invoice.after_discount|floatformat }}</td>
+                </tr>
+            {% endif %}
+            {% if invoice.invoice_type == 1 or invoice.invoice_type == 2 or invoice.invoice_type == 3 %}
+                {% if invoice.treasury_in != invoice.overall %}
+                    <tr>
+                        <td colspan="4">مدفوع</td>
+                        <td>{{ invoice.treasury_in|floatformat }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">الرصيد</td>
+                        <td>{{ invoice.customer.balance|floatformat }}</td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                {% if invoice.treasury_out != invoice.overall %}
+                    <tr>
+                        <td colspan="4">مدفوع</td>
+                        <td>{{ invoice.treasury_out|floatformat }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">الرصيد</td>
+                        <td>{{ invoice.customer.balance|floatformat }}</td>
+                    </tr>
+                {% endif %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% if setting.print_invoice_comments %}
+        {% if invoice.comment %}
+            <div class="col-lg-12">
+                {{ invoice.comment|linebreaks }}
+            </div>
+        {% endif %}
+    {% endif %}
+    <div class="col-lg-12">
+        <div class="row">
+            {% if setting.footer1_location == 2 %}
+                {% if setting.footer1 %}
+                    <div class="col-lg-12">
+                        {{ setting.footer1|linebreaks }}
+                    </div>
+                {% endif %}
+            {% endif %}
+            {% if setting.footer2 %}
+                <div class="col-lg-12">
+                    {{ setting.footer2|linebreaks }}
+                </div>
+            {% endif %}
+            <div class="col-lg-12" style=" text-align: right;">
+                <small class="small">
+                    تصميم وبرمجة شركة اون لينك لخدمات تكنولوجيا المعلومات
+                    01066440666
+                </small>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        window.print();
+    </script>
+{% endblock %}

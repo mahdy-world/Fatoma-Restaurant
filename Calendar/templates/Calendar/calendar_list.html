@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        {% if perms.Calendar.add_task %}
+        <a href="{% url 'Calendar:TaskCreate' %}" class="btn btn-success btn-block" data-toggle="modal"
+           data-target="#sub_modal">
+            <i class="fa fa-plus-circle"></i>
+            إضافة
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-th-list"></i>
+                المواعيد والمهام
+                {% if perms.Calendar.download_task_data %}
+                    <a href="{% url 'Calendar:TaskXls' %}" class="btn btn-outline-danger btn-sm" style="float: left;"> 
+                        <i class="fas fa-file-excel"></i>
+                            تنزيل البيانات
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>#</td>
+                            <td>التاريخ</td>
+                            <td>النوع</td>
+                            <td>المحتوي</td>
+                            <td>متعلقة بـ</td>
+                            <td>الموظف</td>
+                            <td>المنشئ</td>
+                            <td>تم</td>
+                            <td>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <form method="get" action="#">
+                                <td>
+                                    <input type="number" class="form-control input-xs" name="id">
+                                </td>
+                                <td>
+                                    <input type="date" name="from_date" id="from_date">
+                                    <input type="date" name="to_date" id="to_date">
+                                </td>
+                                <td>
+                                    <select name="task_type" class="select2 form-control input-xs">
+                                        <option value="0" selected>الجميع</option>
+                                        <option value="1">خاص</option>
+                                        <option value="2">عام</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input name="comment" placeholder="المحتوي">
+                                </td>
+                                <td>
+                                    {{ form.related_to }}
+                                </td>
+                                <td>
+                                    {{ form.employee }}
+                                </td>
+                                <td>
+                                    {{ form.creator }}
+                                </td>
+                                <td>
+                                    <select name="done" class="select2 form-control input-xs">
+                                        <option value="0" selected>الجميع</option>
+                                        <option value="True">نعم</option>
+                                        <option value="False">لا</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-block btn-xs bg-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                        {% for x in object_list %}
+                            <tr class="{% if x.done %}bg-success{% endif %}{% if x.is_overdue %}bg-danger{% endif %}{% if x.is_today %}bg-warning{% endif %}">
+                                <td>{{ x.id }}</td>
+                                <td>{{ x.date.isoformat }}</td>
+                                <td>{{ x.get_task_type_display }}</td>
+                                <td>
+                                    <a href="{% url 'Calendar:TaskView' x.id %}">
+                                        {{ x.comment }}
+                                    </a>
+                                </td>
+                                <td>{{ x.related_to }}</td>
+                                <td>{{ x.employee }}</td>
+                                <td>{{ x.assigned_by }}</td>
+                                <td>
+                                    {% if x.done %}
+                                        <i class="fa fa-check-circle"></i>
+                                    {% else %}
+                                        <i class="fa fa-times-circle"></i>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if perms.Calendar.end_task %}
+                                    <a href="{% url 'Calendar:TaskDone' x.id %}" class="btn-sm btn-success"
+                                       title="تم" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-check"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if perms.Calendar.edit_task %}
+                                    <a href="{% url 'Calendar:TaskUpdate' x.id %}" class="btn-sm btn-info"
+                                       title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if x.task_type == 1  and perms.Calendar.transfer_task %}
+                                        <a href="{% url 'Calendar:TaskTransfer' x.id %}" class="btn-sm btn-warning"
+                                           title="تحويل" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-exchange-alt"></i>
+                                        </a>
+                                    {% endif %}
+                                    {% if perms.Calendar.delete_task %}
+                                    <a href="{% url 'Calendar:TaskDelete' x.id %}" class="btn-sm btn-danger"
+                                       title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if is_paginated %}
+                <div class="card-footer">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&laquo;</span></li>
+                            {% endif %}
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="active page-item"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        var today = new Date().toISOString().split('T')[0];
+        $("#from_date").val(today);
+        $("#to_date").val(today);
+    </script>
+{% endblock %}

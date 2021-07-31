@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        {% if perms.Maintenance.add_ticket %}
+        <a href="{% url 'Maintenance:TicketCreate' %}" class="btn btn-block btn-success" data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-plus-circle"></i> إضافة
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list"></i>
+                تذاكر الصيانة
+                {% if perms.Maintenance.download_tickets_data %}
+                    <a href="{% url 'Maintenance:TicketXls' %}" class="btn btn-outline-danger btn-sm" style="float: left;"> 
+                        <i class="fas fa-file-excel"></i>
+                            تنزيل البيانات
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <td>#</td>
+                        <td>التاريخ</td>
+                        <td>اسم العميل</td>
+                        <td>موبايل</td>
+                        <td>الجهاز</td>
+                        <td>سيريال</td>
+                        <td>الحالة</td>
+                        <td>استلم</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="number" name="id" placeholder="#">
+                        </td>
+                        <td>
+
+                        </td>
+                        <td>
+                            <input type="text" name="customer_name" placeholder="اسم العميل" value="{{ request.GET.customer_name }}">
+                        </td>
+                        <td>
+                            <input type="text" name="mobile" placeholder="موبايل" value="{{ request.GET.mobile }}">
+                        </td>
+                        <td>
+                            <input type="text" name="device_barcode" placeholder="باركود" value="{{ request.GET.barcode }}">
+                        </td>
+                        <td>
+                            <input type="text" name="serial" placeholder="سيريال" value="{{ request.GET.serial }}">
+                        </td>
+                        <td>
+                            <select name="status">
+                                <option value="0"{% if request.GET.status == 0 %} selected{% endif %}>جميع التذاكر</option>
+                                <option value="1"{% if request.GET.status == 1 %} selected{% endif %}>قيد التشخيص</option>
+                                <option value="2"{% if request.GET.status == 2 %} selected{% endif %}>قيد التقييم</option>
+                                <option value="3"{% if request.GET.status == 3 %} selected{% endif %}>في انتظار رد العميل</option>
+                                <option value="4"{% if request.GET.status == 4 %} selected{% endif %}>العميل يرفض التكلفة</option>
+                                <option value="6"{% if request.GET.status == 6 %} selected{% endif %}>قيد الاصلاح</option>
+                                <option value="7"{% if request.GET.status == 7 %} selected{% endif %}>تمت الصيانة</option>
+                                <option value="8"{% if request.GET.status == 8 %} selected{% endif %}>لا يمكن إصلاح الجهاز</option>
+                            </select>
+                        </td>
+                    <td></td>
+                        <td>
+                            <button class="btn btn-block bg-primary">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for x in object_list %}
+                        <tr>
+                            <td>{{ x.id }}</td>
+                            <td>{{ x.date.date.isoformat }}</td>
+                            <td>{{ x.customer.name }}</td>
+                            <td><a href="tel:{{ x.customer.phone }}">{{ x.customer.phone }}</a></td>
+                            <td>{{ x.product }}</td>
+                            <td>{{ x.sn }}</td>
+                            <td>{{ x.get_status_display }}</td>
+                            <td>
+                                {% if x.customer_received %}
+                                <i class="fa fa-check-circle"></i>
+                                {% else %}
+                                <i class="fa fa-minus-circle"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'Maintenance:TicketDetail' x.id %}" class="btn-sm btn-info">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                                {% if perms.Maintenance.ticket_Transfer %}
+                                <a href="{% url 'Maintenance:TransferTo' x.id %}" class="btn-sm btn-warning"
+                                data-toggle="modal" data-target="#sub_modal">
+                                    <i class="fa fa-forward"></i>
+                                </a>
+                                {% endif %}
+                                {% if perms.Maintenance.delete_ticket %}
+                                <a href="{% url 'Maintenance:TicketDelete' x.id %}" class="btn-sm btn-danger"
+                                data-toggle="modal" data-target="#sub_modal">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

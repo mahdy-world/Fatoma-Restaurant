@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block body %}
+
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">تقارير حركة منتج</div>
+            <div class="card-body">
+                <form>
+                    {{ form }}
+                    <button name="submit" class="btn btn-success" type="submit" value="1"><i
+                            class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <td>#</td>
+            <td>التاريخ</td>
+            <td>الفاتورة</td>
+            <td>المنتج</td>
+            <td>الكمية</td>
+            <td>السعر</td>
+            <td>الربح</td>
+            </thead>
+            <tbody>
+            {% for x in object_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ x.invoice.date.astimezone.date.isoformat }}</td>
+                    <td>{{ x.invoice }}</td>
+                    <td>{{ x }}</td>
+                    <td>{{ x.quantity }}</td>
+                    <td>{{ x.after_discount }}</td>
+                    <td>{{ x.cost_profit }}/{{ x.purchase_profit }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td></td>
+                <td></td>
+                <td>إجمالي المبيعات</td>
+                <td></td>
+                <td>{{ sales.total }}</td>
+                <td>{{ sales.value }}</td>
+                <td>{{ sales.cost_profit }}/{{ sales.purchase_profit }}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>إجمالي المشتريات</td>
+                <td></td>
+                <td>{{ purchases.total }}</td>
+                <td>{{ purchases.value }}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>إجمالي مرتجع المبيعات</td>
+                <td></td>
+                <td>{{ r_sales.total }}</td>
+                <td>{{ r_sales.value }}</td>
+                <td>{{ r_sales.cost_profit }}/{{ r_sales.purchase_profit }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>إجمالي مرتجع المشتريات</td>
+                <td></td>
+                <td>{{ r_purchases.total }}</td>
+                <td>{{ r_purchases.value }}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>إجمالي العجز</td>
+                <td></td>
+                <td>{{ minus.total }}</td>
+                <td>{{ minus.value }}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>إجمالي الزيادة</td>
+                <td></td>
+                <td>{{ plus.total }}</td>
+                <td>{{ plus.value }}</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

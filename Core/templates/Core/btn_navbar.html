@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-bottom">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        <small>
+            جميع الحقوق محفوظة لشركة
+            <a href="http://www.onlink4it.com" target="_blank" class="fixed-link">
+                اون لينك
+            </a>
+            <i class="fa fa-copyright"></i>
+            2008-2020
+        </small>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-4 col-xs-4">
+        <a href="{% url 'Core:ChangeLog' %}" data-toggle="modal" data-target="#sub_modal" class="fixed-link">
+            <small>
+                إنتهاء الترخيص:
+                {{ license_expiration }}
+                |
+                إنتهاء الدعم:
+                {{ support_expiration }}
+                |
+                إنتهاء الإستضافة:
+                {{ host_expiration }}
+            </small>
+        </a>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-4">
+        <a href="{% url 'Core:ChangeLog' %}" data-toggle="modal" data-target="#sub_modal" class="fixed-link">
+            <small class="pull-right">
+                <i class="fa fa-info-circle"></i>
+                نسخة
+                1.2.2
+            </small>
+        </a>
+    </div>
+
+</nav>

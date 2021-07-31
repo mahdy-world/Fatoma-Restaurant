@@ -1,0 +1,81 @@
+body {
+    direction: rtl !important;
+    text-align: right;
+}
+
+@media (min-width: 768px) {
+    .layout-fixed .main-sidebar {
+        right: 0 !important;
+        left: auto;
+    }
+}
+
+@media (min-width: 768px) {
+    body:not(.sidebar-mini-md) .content-wrapper, body:not(.sidebar-mini-md) .main-footer, body:not(.sidebar-mini-md) .main-header {
+        transition: margin-right .3s ease-in-out;
+        margin-right: 250px;
+        margin-left: 0;
+    }
+}
+
+.nav-sidebar .nav-link > .right, .nav-sidebar .nav-link > p > .right {
+    left: 1rem;
+    right: auto !important;
+}
+
+.small-box .icon > i {
+    right: auto !important;
+    left: 15px !important;
+}
+
+.card-title {
+    float: right !important;
+}
+
+.card-tools {
+    float: left !important;
+}
+
+.control-sidebar, .control-sidebar::before {
+    display: block;
+    left: -250px !important;
+    right: auto !important;
+}
+
+.control-sidebar-slide-open .control-sidebar, .control-sidebar-slide-open .control-sidebar::before {
+    left: 0 !important;
+    right: auto;
+}
+
+@media (min-width: 992px) {
+    .sidebar-mini.sidebar-collapse .content-wrapper, .sidebar-mini.sidebar-collapse .main-footer, .sidebar-mini.sidebar-collapse .main-header {
+        margin-right: 4.6rem !important;
+        margin-left: 0 !important;
+    }
+}
+
+
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border: none !important;
+        }
+
+        .select2-container .select2-selection--multiple {
+            min-height: 0 !important;
+            height: 100%;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--multiple, .select2-container--default.select2-container--focus .select2-selection--single {
+            border: none !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 16px !important;
+        }
+        :focus {
+    outline: -webkit-focus-ring-color auto 0 !important;
+}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">{{ title }}</div>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            {% block cardbody %}
+
+            {% endblock %}
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    {% if object_list.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ object_list.previous_page_number  }}">Previous</a></li>
+                    {% endif %}
+                    <li class="page-item dis"><a class="disabled" href="#">{{ object_list.paginator.current_page }}</a></li>
+                    {% if object_list.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page{{ object_list.previous_page_number  }}">{{ object_list.previous_page_number  }}</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ objectt_list.paginator.num_pages }}">{{ objectt_list.paginator.num_pages }}</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,123 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="{% url 'Website:HomePage' %}">
+        {% if setting.logo %}
+            <img src="{{ setting.logo.url }}" style="max-height: 60px;">
+        {% else %}
+            {{ setting.title }}
+        {% endif %}
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+        <form class="form-inline my-2 my-lg-0" action="{% url 'Website:Search' %}" method="get">
+            <input class="form-control mr-sm-2" type="search" placeholder="بحث ..." aria-label="Search" name="q">
+        </form>
+
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="{% url 'Website:HomePage' %}">
+                    <i class="fa fa-home"></i>
+                    الرئيسية
+                    <span class="sr-only">(current)</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-shopping-cart"></i>
+                    المتجر
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% for x in main_categories %}
+                        {% if x.subcategory_set.all.count > 0 %}
+                            <a class="dropdown-item dropdown-toggle" href="{% url 'Website:HomePage' %}">
+                        {% else %}
+                            <a class="dropdown-item" href="{% url 'Website:HomePage' %}">
+                        {% endif %}
+                    <i class="fa fa-th"></i>
+                    {{ x.name }}
+                    </a>
+                        {% if x.subcategory_set.all.count > 0 %}
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {% for y in x.subcategory_set.all %}
+                                    <li>
+                                        <a href="{% url 'Website:ProductList' y.id %}" class="dropdown-item">
+                                            <i class="fa fa-list"></i>
+                                            {{ y.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </li>
+            {% if request.user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user"></i>
+                        {{ request.user }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% if request.user.is_staff %}
+                            <a class="dropdown-item" href="{% url 'Core:index' %}" target="_blank">
+                                <i class="fa fa-cog"></i>
+                                لوحة تحكم الادارة
+                            </a>
+                            <div class="dropdown-divider"></div>
+                        {% endif %}
+                        <a class="dropdown-item" href="{% url 'Auth:account_setting' %}" data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-shopping-cart"></i>
+                            سلة المشتريات
+                        </a>
+                        <a class="dropdown-item" href="{% url 'Auth:account_setting' %}" data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-clipboard-list"></i>
+                            طلباتي
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'Auth:change_password' %}" data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-asterisk"></i>
+                            تغيير كلمة السر
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'Auth:UserLogout' %}">
+                            <i class="fa fa-power-off"></i>
+                            تسجيل خروج
+                        </a>
+                    </div>
+                </li>
+            {% else %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user"></i>
+                        تسجيل
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'Auth:UserLogin' %}" data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-sign-in-alt"></i>
+                            تسجيل دخول
+                        </a>
+                        <a class="dropdown-item" href="{% url 'Auth:RegisterUser' %}" data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-user-plus"></i>
+                            حساب جديد
+                        </a>
+                    </div>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>

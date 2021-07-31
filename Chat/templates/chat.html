@@ -1,0 +1,67 @@
+{% extends 'empty_base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+    <div class="col-12" style="margin-top: 10px;">
+        <div class="row">
+
+            <div class="col-12">
+                <div class="card">
+                    <div class="direct-chat-messages" id=board>
+                        {% block messages %}
+
+                        {% endblock %}
+
+                    </div>
+                    <form id="chat-box" class="form-group {% block hide %}hide{% endblock %}" method="post"
+                          action="{{ action_url }}">
+                        {% csrf_token %}
+                        <div class="input-group card-footer">
+                            <input id="id_message" name="message" type="text" placeholder="اكتب رسالتك هنا......"
+                                   class="form-control" autocomplete="off">
+                            <span class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </span>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+
+{% block js %}
+    {% load static %}
+    <script src="{% static 'chat/js/chat.js' %}"></script>
+    <script type="text/javascript" src="{% static 'chat/js/jquery3-2.js' %}"></script>
+    <script>
+        $(function () {
+            $('#user{{ receiver.id }}').addClass('active');
+            //Call receive function each 1 seconds to check for new messages in the database
+            setInterval(receive, 1000)
+        })
+    </script>
+
+    <script>
+
+        // For receiving
+        sender_id = "{{ receiver.id }}";
+        receiver_id = "{{ request.user.id }}";
+
+        //For sending
+        $(function () {
+            scrolltoend();
+            $('#chat-box').on('submit', function (event) {
+                event.preventDefault();
+                var message = $('#id_message');
+                send('{{ request.user.username }}', '{{ receiver.username }}', message.val());
+                message.val('');
+            })
+        })
+    </script>
+{% endblock %}

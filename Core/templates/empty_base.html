@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>ONERP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome/css/all.css' %}">
+    <link rel="stylesheet" href="{% static 'AdminLTE/dist/css/adminlte-rtl.css' %}">
+    <style>
+
+        body {
+            font-family: Cairo;
+        }
+
+    </style>
+    {% block head %}
+
+    {% endblock %}
+</head>
+<body dir="rtl">
+
+<div class="container">
+    <div class="row">
+        {% block alert %}
+            {% if alert %}
+                <div class="col-lg-12 center-text">
+                    <div class="alert alert-danger">{{ alert }}</div>
+                </div>
+            {% endif %}
+        {% endblock %}
+        {% block body %}
+
+        {% endblock %}
+    </div>
+</div>
+{% block modal %}
+
+{% endblock %}
+<script src="{% static 'js/ONERP.js' %}"></script>
+<script>
+    function get_url() {
+        var url_input = $('.url_input');
+        url_input.each(function (i) {
+            $(this).val(window.location.href);
+        });
+        return url_input;
+    }
+</script>
+{% block js %}
+
+{% endblock %}
+</body>
+</html>

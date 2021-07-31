@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block navbar %}
+
+{% endblock %}
+{% block head %}
+    <style>
+        {% load staticfiles %}
+    body{
+        background-image: url({% static 'img/login-bg.jpg' %});
+    }
+    .login-card{
+        background-color: rgba(28, 49, 68, 0.5) !important;
+    }
+    </style>
+{% endblock %}
+{% block public_body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 center login-container">
+                <div class="card login-card">
+                    <div class="card-header">
+                        <i class="fa fa-user"></i>
+                        تسجيل الدخول إلي النظام
+                    </div>
+                    <div class="card-body">
+                        <form class="form-horizontal" action="#" method="post">
+                            {% csrf_token %}
+                            {% if error %}
+                                <div class="alert alert-danger">
+                                {{ error }}
+                                </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <input class="form-control" name="username" placeholder="اسم المستخدم" required="required"  >
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" name="password" placeholder="كلمة المرور" type="password" required="required">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success btn-block" type="submit">
+                                    <i class="fa fa-check-circle"></i>
+                                </button>
+                                <a class="btn btn-warning btn-block" href="{% url 'password_reset' %}">
+                                    <i class="fa fa-help"></i>  نسيت كلمة السر؟
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

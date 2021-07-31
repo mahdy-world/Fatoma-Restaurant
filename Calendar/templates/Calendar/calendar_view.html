@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block body %}
+
+    <div class="col-lg-4 col-md-4">
+        {% if perms.Calendar.end_task %}
+        <a href="{% url 'Calendar:TaskDone' object.id %}" class="btn btn-success btn-block" data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-check"></i>
+            تم
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-4 col-md-4">
+        {% if perms.Calendar.edit_task %}
+        <a href="{% url 'Calendar:TaskUpdate' object.id %}" class="btn btn-info btn-block" data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-edit"></i>
+            تعديل
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-4 col-md-4">
+        {% if perms.Calendar.transfer_task %}
+        <a href="{% url 'Calendar:TaskTransfer' object.id %}" class="btn btn-warning btn-block" data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-exchange-alt"></i>
+            تحويل
+        </a>
+        {% endif %}
+    </div>
+    {% for x in object.taskrespond_set.all %}
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                {{ x.done_by }}
+                <br>
+                <small>
+                    {{ x.created_date.date.isoformat }}
+                </small>
+            </div>
+            <div class="card-body">
+                {{ x.comment|linebreaks|safe }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+    <div class="card">
+        <div class="card-header">
+            أصناف وصلت للرصيد الحرج
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                <td>#</td>
+                <td>المنتج</td>
+                <td>كود</td>
+                <td>حد الطلب</td>
+                <td>الرصيد الحرج</td>
+                <td>الكمية</td>
+                </thead>
+                <tbody>
+                {% for x in object_list %}
+                    {% if x.current_stock <= x.critical_stock %}
+                        <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ x }}</td>
+                        <td>{{ x.id }}</td>
+                        <td>{{ x.full_stock }}</td>
+                        <td>{{ x.critical_stock }}</td>
+                        <td>{{ x.current_stock }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,17 @@
+.productImage{
+    position: relative;
+    height: 100vh;
+    max-height: 100px;
+    display: block;
+    margin: auto;
+}
+.btn {
+    border-radius: 0px;
+}
+#product_buttons{
+    position: relative;
+    bottom: 0px;
+}
+#product_price{
+    display: block;
+}

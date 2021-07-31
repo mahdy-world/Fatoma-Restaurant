@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="card card-primary card-outline col-lg-12 " >
+    <div class="card-header">
+      <h3 class="card-title">
+        <h1>  تقرير نقطة البيع : {{ single_pos.name }} </h1>
+      </h3>
+    </div>
+    <div class="card-body mt-1" >
+      <ul class="nav nav-tabs" id="custom-content-above-tab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="custom-content-above-home-tab" data-toggle="pill" href="#custom-content-above-home" role="tab" aria-controls="custom-content-above-home" aria-selected="true">تقارير الطلبات المنتهية</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="custom-content-above-profile-tab" data-toggle="pill" href="#custom-content-above-profile" role="tab" aria-controls="custom-content-above-profile" aria-selected="false">تقارير العملاء</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="custom-content-above-messages-tab" data-toggle="pill" href="#custom-content-above-messages" role="tab" aria-controls="custom-content-above-messages" aria-selected="false">تقارير الشيفتات</a>
+        </li>
+      </ul>
+      <div class="tab-content mt-3" id="custom-content-above-tabContent">
+        <div class="tab-pane fade show active" id="custom-content-above-home" role="tabpanel" aria-labelledby="custom-content-above-home-tab">
+          <div class="col-lg-12 table-responsive" >
+            <table class="table table-hover">
+                <thead>
+                <td>#</td>
+                <td>تاريخ ووقت الطلب</td>
+                <td>العميل</td>
+                <td>البلغ الكلي</td>
+                <td>طريقة الدفع</td>
+                </thead>
+                <tbody>
+                {% for x in orders %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ x.date }}</td>
+                        <td>{{ x.customer }}</td>
+                        <td>{{ x.total }}</td>
+                        <td>{{ x.get_payment_method_display }}</td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="custom-content-above-profile" role="tabpanel" aria-labelledby="custom-content-above-profile-tab">
+          <h3> عدد وقيمة الطلبات المنتهية للعملاء</h3>
+          <div class="col-lg-12 table-responsive" >
+            <table class="table table-hover">
+                <thead>
+                <td>#</td>
+                <td>اسم العميل</td>
+                <td>الشريك</td>
+                <td>الشريحة</td>
+                <td> عدد المبيعات</td>
+                <td>قيمة المبيعات</td>
+                </thead>
+                <tbody>
+                {% for x in orders_detail %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        {% if perms.Customers.view_customer %}
+                          <td><a href="{% url 'Customers:CustomerDetail' x.0 %}">{{ x.1 }}</a></td>
+                        {% else %}
+                          <td>{{ x.1 }}</td>
+                        {% endif %}
+                        <td>{% if x.3 != None %}{{ x.3 }}{% else %}لا يوجد شريك {% endif %}</td>
+                        
+                        <td> {% if x.2 != None %}{{ x.2 }}{% else %}لا يوجد شريحة {% endif %}</td>
+                        <td>{{ x.4 }}</td>
+                        <td>{{ x.5 }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+          </div>
+          <h3> جميع العملاء</h3>
+            <div class="col-lg-12 table-responsive ">
+                <table class="table table-hover">
+                    <thead>
+                    <td>#</td>
+                    <td>اسم العميل</td>
+                    <td>الشريحة</td>
+                    <td>الرقم</td>
+                    </thead>
+                    <tbody>
+                    {% for x in customers %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            {% if perms.Customers.view_customer %}
+                            <td><a href="{% url 'Customers:CustomerDetail' x.id %}">{{ x.name}}</a></td>
+                            {% else %}
+                            <td>{{ x.name}}</td>
+                            {% endif %}
+                            <td>{% if x.category %}{{ x.category }} {% else %} لا يوجد شريحة {% endif %}</td>
+                            <td> {% if x.phone != None %}{{ x.phone }}{% else %}لا يوجد رقم {% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="custom-content-above-messages" role="tabpanel" aria-labelledby="custom-content-above-messages-tab">
+          <div class="col-lg-12 table-responsive ">
+            <table class="table table-hover">
+                <thead>
+                <td>#</td>
+                <td>الموظف</td>
+                <td>التاريخ</td>
+                <td>حالة الشيفت</td>
+                <td>تقرير الشيفت</td>
+                </thead>
+                <tbody>
+                {% for x in shifts %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        {% if perms.HR.view_employee_data %}
+                          <td><a  href="{% url 'HR:EmployeeDetail' x.employee.id %}">{{ x.employee }}</a></td>
+                        {% else %}
+                          <td><a>{{ x.employee }}</a></td>
+                        {% endif %}
+                        <td>{{ x.date }}</td>
+                        <td>{{ x.get_status_display }}</td>
+                        <td>
+                          {% if perms.POS.view_shift_report %}
+                          <a href="{% url 'POS:Report' x.id %}" class="btn btn-success"
+                          title="عرض تقرير الشيفت">
+                              <i class="fa fa-eye"></i>
+                          </a>
+                          {% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+
+{% endblock %}
+{% block js %}
+<script>
+
+</script>
+{% endblock %}

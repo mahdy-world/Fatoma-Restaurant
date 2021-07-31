@@ -1,0 +1,471 @@
+{% extends 'base.html' %}
+{% load mathfilters %}
+{% block body %}
+    <div class="col-lg-6 col-md-3 col-sm-6 dont-print">
+        {% if perms.Products.edit_product %}
+        <a href="{% url 'Products:ProductUpdate' object.id %}" class="btn btn-info btn-block"
+           data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-edit"></i>
+            تعديل
+            {{ object.current_stock }}
+        </a>
+        {% endif %}
+    </div>
+    <!-- <div class="col-lg-3 col-md-3 col-sm-6 dont-print">
+        <a href="" class="btn btn-success btn-block"
+           data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-dollar-sign"></i>
+            شرائح الأسعار
+        </a>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-6 dont-print">
+        <a href="" class="btn btn-primary btn-block"
+           data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-arrow-circle-up"></i>
+            تغيير الوظيفة
+        </a>
+    </div> -->
+    <div class="col-lg-6 col-md-3 col-sm-6 dont-print">
+        <a href="" class="btn btn-warning btn-block" onclick="window.print()">
+            <i class="fa fa-print"></i>
+            طباعة
+        </a>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list"></i>
+                معلومات الصنف
+            </div>
+            <div class="card-body">
+                {% if object.image %}
+                    <img src="{{ object.image.url }}" style="max-height: 200px; max-width: 100px;"
+                         class="img-responsive">
+                {% else %}
+                    <i class="fa fa-5x fa-image"></i>
+                {% endif %}
+                <table class="table table-responsive table-hover">
+                    <tr>
+                        <td>
+                            الاسم
+                        </td>
+                        <td>
+                            {{ object.name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            الوصف
+                        </td>
+                        <td>
+                            {{ object.description|linebreaks }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            التصنيف الرئيسي
+                        </td>
+                        <td>
+                            {{ object.sub_category.main_category }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            التصنيف الفرعي
+                        </td>
+                        <td>
+                            {{ object.sub_category.name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            الشركة المصنعة
+                        </td>
+                        <td>
+                            {{ object.manufacture }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            البراند
+                        </td>
+                        <td>
+                            {{ object.brand }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            سعر الشراء
+                        </td>
+                        <td>
+                            {{ object.purchase_price }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            سعر التكلفة
+                        </td>
+                        <td>
+                            {{ object.cost_price }}
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            سعر البيع
+                        </td>
+                        <td>
+                            {{ object.sell_price }}
+                        </td>
+
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-th"></i>
+                بيانات مخزنية
+            </div>
+            <div class="card-body">
+                <table class="table table-responsive table-hover">
+
+                    <!-- <tr>
+                        <td>
+                            الوحدة الفرعية
+                        </td>
+                        <td>
+                            {{ object.sub_unit }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            العدد في الوحدة الفرعية
+                        </td>
+                        <td>
+                            {{ object.amount_in_sub_unit }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            الوحدة الفرعية 2
+                        </td>
+                        <td>
+                            {{ object.sub_sub_unit }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            العدد في الوحدة الفرعية 2
+                        </td>
+                        <td>
+                            {{ object.amount_in_sub_sub_unit }}
+                        </td>
+                    </tr> -->
+                    <tr>
+                        <td>
+                            حد الطلب
+                        </td>
+                        <td>
+                            {{ object.full_stock }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            حد الصرف
+                        </td>
+                        <td>
+                            {{ object.max_sell }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            الرصيد الحرج
+                        </td>
+                        <td>
+                            {{ object.critical_stock }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+
+        {% if object.product_type == 2 %}
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list-alt"></i>
+                المكونات
+                <span class="float-left dont-print">
+                {% if perms.Products.add_group_product %}
+                <a href="{% url 'Products:GroupedProductCreate' object.id %}" class="btn-sm btn-success" title="إضافة"
+                   data-toggle="modal" data-target="#sub_modal">
+                    <i class="fa fa-plus-circle"></i>
+                </a>
+                {% endif %}
+            </span>
+            </div>
+            <div class="card-body">
+                <table class="table table-responsive table-hover">
+                    <thead>
+                    <td>#</td>
+                    <td>المنتج</td>
+                    <td>الكمية</td>
+                    <td></td>
+                    </thead>
+                    <tbody>
+                    {% for x in object.grouped_item.all %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ x.contain }}</td>
+                            <td>{{ x.quantity }}</td>
+                        <td>
+                            {% if perms.Products.edit_group_product %}
+                                <a href="{% url 'Products:GroupedProductUpdate' x.id %}"
+                                   class="btn-sm btn-info" data-toggle="modal" data-target="#sub_modal" title="تعديل">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            {% endif %}
+                            {% if perms.Products.delete_group_product %}
+                                <a href="{% url 'Products:GroupedProductDelete' x.id %}"
+                                   class="btn-sm btn-danger" title="حذف">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fa fa-list-alt"></i>
+                        شرائح الأسعار
+                    </div>
+                    <div class="card-tools">
+                        {% include 'card-tools.html' %}
+                        <span class="float-left dont-print">
+                        <span>&nbsp;</span>
+                    </div>
+                </div>
+                 <div class="card-body table-responsive">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <span> السعر الرئيسي: {{ object.sell_price }}</span>
+                            </div>
+                            <div class="col-md-5">
+                                <span> اخر تحديث للسعر الرئيسي: {{ object.sell_price_last_update.date.isoformat }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <span><input type="checkbox" onchange="SegmentsNeedUpdate(this)"> <label
+                                        style="font-size: x-small">عرض الشرائح التي تحتاج الي تحديث فقط</label> </span>
+                                <span><input type="hidden" id="update_date"
+                                             value="{{ object.sell_price_last_update.date.isoformat }}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-hover text-center" id="segments_all">
+                    <thead style="font-size: x-small">
+                    <th>#</th>
+                    <th>الشريحة</th>
+                    <th>السعر قبل الخصم</th>
+                    <th>النسبة</th>
+                    <th>الخصم</th>
+                    <th>السعر بعد الخصم</th>
+                    <th>آخر تحديث</th>
+                    <th>عمليات</th>
+                    </thead>
+                    <tbody>
+                    {% for x in product.productprices_set.all|dictsort:"order" %}
+                        {% if x.deleted == 0 %}
+                            <tr>
+                                <td>{% if x.inactive == 1 %}
+                                    <del>{{ x.id }}</del>{% else %}{{ x.id }}{% endif %}</td>
+                                <td>{% if x.inactive == 1 %}
+                                    <del>{{ x.customer_segment }}</del>{% else %}{{ x.customer_segment }}{% endif %}
+                                </td>
+                                <td>{% if x.inactive == 1 %}
+                                    <del>{{ x.price }}</del>{% else %}{{ x.price }}{% endif %}</td>
+                                <td>
+                                    %
+                                    {% if x.inactive == 1 %}
+                                        <del>{{ x.discount|stringformat:".2f" }}</del>{% else %}
+                                        {{ x.discount|stringformat:".2f" }}{% endif %}
+                                    {% if x.opration == 1 %}
+                                        {% if x.inactive == 1 %}
+                                            <del> -</del>{% else %} - {% endif %}
+                                    {% endif %}
+                                    {% if x.opration == 2 %}
+                                        {% if x.inactive == 2 %}
+                                            <del> +</del>{% else %} + {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if x.inactive == 1 %}
+                                        <del>{{ x.price|mul:x.discount|div:100|stringformat:".2f" }}</del>{% else %}
+                                        {{ x.price|mul:x.discount|div:100|stringformat:".2f" }}{% endif %}
+                                    {% if x.opration == 1 %}
+                                        {% if x.inactive == 1 %}
+                                            <del> -</del>{% else %} - {% endif %}
+                                    {% endif %}
+                                    {% if x.opration == 2 %}
+                                        {% if x.inactive == 2 %}
+                                            <del> +</del>{% else %} + {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>{% if x.inactive == 1 %}
+                                    <del>{{ x.new_price }}</del>{% else %}{{ x.new_price }}{% endif %}</td>
+                                <td>{% if x.inactive == 1 %}
+                                    <del>{{ x.last_update.date.isoformat }}</del>{% else %}
+                                    {{ x.last_update.date.isoformat }}{% endif %}</td>
+                                <td>
+                                    <a style="font-size: x-small"
+                                       href="{% url 'Products:PricesProductUpdate' x.id object.id %}"
+                                       class="btn-sm btn-info" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    {% if x.inactive == 0 %}
+                                        <span>&nbsp;</span>
+                                        <a style="font-size: x-small"
+                                           href="{% url 'Products:PricesProductStop' x.id object.id %}"
+                                           class="btn-sm btn-secondary" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-ban"></i>
+                                        </a>
+                                    {% endif %}
+                                    {% if x.inactive == 1 %}
+                                        <span>&nbsp;</span>
+                                        <a style="font-size: x-small"
+                                           href="{% url 'Products:PricesProductActive' x.id object.id %}"
+                                           class="btn-sm btn-secondary" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-ban"></i>
+                                        </a>
+                                    {% endif %}
+                                    <span>&nbsp;</span>
+                                    <a style="font-size: x-small"
+                                       href="{% url 'Products:PricesProductDelete' x.id object.id %}"
+                                       class="btn-sm btn-danger" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- <div class="card">
+            <div class="card-header">
+                <i class="fa fa-chart-area"></i>
+                إحصائيات وتقارير
+            </div>
+            <div class="card-body">
+                <form class="form-inline" action="#" method="get">
+                    <div class="form-group">
+                        من
+                        <input name="from-date" class="form-control" type="date">
+                    </div>
+                    <div class="form-group">
+                        إلي
+                        <input name="to-date" class="form-control" type="date">
+                    </div>
+                    <button class="btn btn-info" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </form>
+                <h4>إحصائيات بيع وشراء</h4>
+                <table class="table table-responsive table-hover">
+                    <tr>
+                        <td>إجمالي شراء</td>
+                        <td></td>
+                        <td>إجمالي مرتجع شراء</td>
+                        <td></td>
+                        <td>إجمالي بيع</td>
+                        <td></td>
+                        <td>إجمالي مرتجع بيع</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>قيمة إجمالي شراء</td>
+                        <td></td>
+                        <td>قيمة إجمالي مرتجع شراء</td>
+                        <td></td>
+                        <td>قيمة إجمالي بيع</td>
+                        <td></td>
+                        <td>قيمة إجمالي مرتجع بيع</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>متوسط سعر شراء</td>
+                        <td></td>
+                        <td>متوسط سعر مرتجع شراء</td>
+                        <td></td>
+                        <td>متوسط سعر بيع</td>
+                        <td></td>
+                        <td>متوسط سعر مرتجع بيع</td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                <h4>إحصائيات أرباح</h4>
+                <table class="table table-responsive table-hover">
+                    <tr>
+                        <td>الربح حسب متوسط السعر</td>
+                        <td></td>
+                        <td>النسبة</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>الربح حسب أخر سعر شراء</td>
+                        <td></td>
+                        <td>النسبة</td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div> -->
+    </div>
+
+
+
+{% endblock %}
+{% block js %}
+
+<script>
+    function SegmentsNeedUpdate(Element) {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("update_date");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("segments_all");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[3];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) === -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        if (Element.checked === true) {
+                            tr[i].style.display = "none";
+                        } else {
+                            tr[i].style.display = "";
+                        }
+                    }
+                }
+            }
+        }
+</script>
+
+
+{% endblock %}

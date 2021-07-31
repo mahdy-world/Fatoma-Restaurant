@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-6 col-md-6 col-sm-6 dont-print">
+        {% if perms.HR.edit_employee %}
+        <a href="{% url 'HR:EmployeeUpdate' object.id %}" class="btn btn-info btn-block"
+           data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-edit"></i>
+            تعديل
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 dont-print">
+    {% if object.user  and perms.HR.add_employee_permission %}
+        <a href="{% url 'Auth:permissions' object.user.id %}" class="btn btn-primary btn-block"
+           data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-arrow-circle-up"></i>
+        الصلاحيات
+        </a>
+    {% endif %}
+    </div>
+    <!-- <div class="col-lg-4 col-md-4 col-sm-6 dont-print">
+        <a href="" class="btn btn-success btn-block"
+           data-toggle="modal" data-target="#sub_modal">
+            <i class="fa fa-dollar-sign"></i>
+            تغيير المرتب
+        </a>
+    </div> -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-user"></i>
+                المعلومات الشخصية
+            </div>
+            <div class="card-body">
+                {% if object.image %}
+                    <img src="{{ object.image.url }}" style="max-height: 200px; max-width: 100px;"
+                         class="img-responsive">
+                {% else %}
+                    <i class="fa fa-5x fa-user-circle"></i>
+                {% endif %}
+                <table class="table table-responsive table-hover">
+                    <tr>
+                        <td>
+                            <i class="fa fa-user"></i>
+                        </td>
+                        <td>
+                            {{ object.name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-briefcase"></i>
+                        </td>
+                        <td>
+                            {{ object.job_title }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-mobile"></i>
+                        </td>
+                        <td>
+                            <a href="tel:{{ object.phone }}">{{ object.phone }}</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-birthday-cake"></i>
+                        </td>
+                        <td>
+                            {{ object.birthday.isoformat }}
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-location-arrow"></i>
+                        </td>
+                        <td>
+                            {{ object.address }}
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-at"></i>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ object.email }}">{{ object.email }}</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-university"></i>
+                        </td>
+                        <td>
+                            {{ object.qualification }}
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-id-card"></i>
+                        </td>
+                        <td>
+                            {{ object.get_id_type_display }}
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-hashtag"></i>
+                        </td>
+                        <td>
+                            {{ object.national_id }}
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-calendar-alt"></i>
+                        </td>
+                        <td>
+                            {{ object.settlement_end_date.isoformat }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-church"></i>
+                        </td>
+                        <td>
+                            {{ object.get_religion_display }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-heart"></i>
+                        </td>
+                        <td>
+                            {{ object.get_relationship_display }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-fighter-jet"></i>
+                        </td>
+                        <td>
+                            {{ object.get_military_state_display }}
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-briefcase"></i>
+                بيانات التعيين
+            </div>
+            <div class="card-body">
+                <table class="table table-responsive table-hover">
+                    <tr>
+                        <td>
+                            بداية التعيين
+                        </td>
+                        <td>
+                            {{ object.start_date.isoformat }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            نهاية التعاقد
+                        </td>
+                        <td>
+                            {{ object.end_date.isoformat }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            الراتب
+                        </td>
+                        <td>
+                            {{ object.salary }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            الحافز
+                        </td>
+                        <td>
+                            {{ object.over }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            بداية التأمين
+                        </td>
+                        <td>
+                            {{ object.insurance_start }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            نهاية التأمين
+                        </td>
+                        <td>
+                            {{ object.insurance_end }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            تكلفة التأمين
+                        </td>
+                        <td>
+                            {{ object.insurance_cost }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            نوع الموظف
+                        </td>
+                        <td>
+                            {{ object.get_employee_type_display }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-folder"></i>
+                ملفات الموظف
+                <span class="float-left dont-print">
+                {% if perms.HR.add_employee_file %}
+                <a href="{% url 'HR:UploadFile' object.id %}" class="btn-sm btn-success"
+                    data-toggle="modal" data-target="#sub_modal">
+                    <i class="fa fa-upload"></i>
+                </a>
+                {% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                {% for x in object.employeefile_set.all %}
+                    <a href="{% url 'HR:ViewFile' x.id %}" data-toggle="modal" data-target="#sub_modal">
+                        <img src="{{ x.file.url }}" class="avatar">
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list"></i>
+                السجل الوظيفي
+            </div>
+            <div class="card-body">
+                {% for x in object.employeefile_set.all %}
+
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

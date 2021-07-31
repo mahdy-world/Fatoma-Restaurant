@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load mathfilters %}
+{% block body %}
+
+<div class="col-lg-12 mt-3">
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-list-alt"></i>
+            بيانات الشيفت
+            <table class="table table-borderless mt-3" >
+                <tfoot>
+                    <tr>
+                        <td>اسم نقطة البيع</td>
+                        <td >{{ single_shift.pos.name }}</td>
+                        <td>اسم الموظف</td>
+                        <td>{{ single_shift.employee.name }}</td>
+                        <td>رقم الكاشير</td>
+                        <td>{{ single_shift.cashier_no }}</td>
+                    </tr>
+                    <tr>
+                        <td>تاريخ الشيفت</td>
+                        <td>{{ single_shift.date }}</td>
+                        <td>وقت البداية </td>
+                        <td>{{ single_shift.start_time }}</td>
+                        <td>وقت النهاية</td>
+                        <td>{{ single_shift.end_time }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div> 
+    </div>
+</div>
+
+<div class="col-lg-12 mt-3">
+    <div class="card">
+        <div class="card-header">
+            <span class="float-left dont-print">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </span>
+            <i class="fa fa-list-alt"></i>
+            تقارير الشيفت
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <th> عدد الطلبات المكتملة</th>
+                    <th class="text-center"> عدد الطلبات الملغية</th>
+                    <th class="text-center">إجمالي الربح</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ ttotal }}</td>
+                        <td class="text-center">{{ total_order_canceled }}</td>
+                        <td class="text-center">{{ money }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr>
+        </div> 
+    </div> 
+
+    <!-- {% if open_orders > 0 %}
+        <div class="card-body table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <th> عدد الطلبات  الغير مكتملة المكتملة</th>
+                    <th class="text-center"> تحويل الطلبات</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ open_orders }}</td>
+                        <td class="text-center"><a href="{% url 'POS:CreateShiftWithOrders' single_shift.pos.id single_shift.id %}" class="btn btn-success"
+                            data-toggle="modal" data-target="#sub_modal"> تحويل</a></td>
+                    </tr>
+                </tbody>
+                
+            </table>
+            <hr>
+        </div> 
+    {% endif %} -->
+     
+</div>
+
+<div class="col-lg-12 mt-3">
+    <div class="card">
+        <div class="card-header">
+            <span class="float-left dont-print">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </span>
+            <i class="fa fa-list-alt"></i>
+            تقارير الاصناف
+            <a href="{% url 'Reports:item_transactions_report' %}" class="btn btn-outline-success btn-sm" style="float: left;"> 
+                <i class="fa fa-arrows-alt-h"></i>
+                    حركة منتج
+            </a>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <th>#</th>
+                    <th> اسم الصنف  </th>
+                    <th class="text-center"> الكمية</th>
+                </thead>
+                <tbody>
+                    {% for a,b in shift_products %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ a }}</td>
+                        <td class="text-center">{{ b }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <hr>
+        </div> 
+    </div> 
+</div>
+
+{% endblock %}

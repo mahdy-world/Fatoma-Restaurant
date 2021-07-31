@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block body %}
+    <!-- Buttons Bar -->
+
+    <div class="col-lg-12">
+        <a href="{% url 'Projects:change_project_status' object.id %}" class="btn btn-block btn-warning"
+           data-toggle="modal" data-target="#action_modal">
+            <i class="fa fa-refresh"></i> تغيير حالة المشروع
+        </a>
+    </div>
+    <!-- <div class="col-lg-4">
+        <a href="" class="btn btn-block btn-success">
+            <i class="fa fa-phone"></i> اتصال بالعميل
+        </a>
+    </div>
+    <div class="col-lg-4">
+        <a href="" class="btn btn-block btn-warning">
+            <i class="fas fa-truck-moving"></i> زيارة العميل
+        </a>
+    </div> -->
+    <!-- End Buttons Bar -->
+
+
+    <!-- Project Info -->
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                بيانات المشروع
+
+                <a href="{% url 'Projects:ProjectUpdate' object.id %}" class="btn-sm btn-info"
+                   data-toggle="modal"
+                   data-target="#action_modal">
+                    <i class="fa fa-edit"></i>
+                </a>
+            </div>
+            <div class="card- table-responsive">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <td>اسم المشروع</td>
+                        <td>{{ object.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>اسم العميل</td>
+                        <td>{{ object.client }}</td>
+                    </tr>
+                    <tr>
+                        <td>رقم التليفون</td>
+                        <td>
+                            {% if object.client.phone %}
+                                <a href="tel:{{ object.client.phone }}">{{ object.client.phone }}</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>تاريخ البدء</td>
+                        <td>
+                            {{ object.start_date.isoformat }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>نسبة إنجاز المشروع</td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar{% if object.complete_percent < 30 %} bg-danger{% elif object.complete_percent >= 30 and object.complete_percent < 50 %} bg-warning{% elif object.complete_percent >= 50 and object.complete_percent < 100 %} bg-info {% else %} bg-success{% endif %}"
+                                     style="width: {{ object.complete_percent }}%"
+                                     role="progressbar"
+                                     aria-valuenow="{{ object.complete_percent }}" aria-valuemin="0"
+                                     aria-valuemax="100">
+                                    {{ object.complete_percent }}%
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- End Project Info -->
+
+
+    <!-- Project Details -->
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                تفاصيل المشروع
+            </div>
+            <div class="card-body">
+                {% for x in object.projectresponse_set.all %}
+                    <div class="row">
+                        {% if request.user == x.user %}
+                            <div class="col-lg-3 col-xs-2">
+                                {% if x.user.avatar %}
+                                    <img src="{{ x.user.avatar.url }}" alt="{{ x.user }}">
+                                {% else %}
+                                    <i class="fa fa-user"></i>
+                                    <br>
+                                    {{ x.user }}
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-9 col-xs-10 btn btn-info">
+                                {{ x.comment|linebreaks }}
+                                <small><i class="fa fa-calendar"></i> {{ x.date.date.isoformat }} <i class="fa fa-clock"></i> {{ x.date.time }}</small>
+                            </div>
+                        {% else %}
+                            <div class="col-lg-9 col-xs-10">
+
+                            </div>
+                            <div class="col-lg-3 col-xs-2">
+
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- End Project Details -->
+{% endblock %}

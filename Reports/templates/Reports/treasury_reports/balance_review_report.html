@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block body %}
+
+{{ invoice_list.1.total1 }}
+
+<h1 class="m-3">تقرير ميزان المراجعة</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">اسم الخزينة</th>
+            <th scope="col">المدين</th>
+            <th scope="col">الدائن</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for a,b,c in invoice_list %}
+            {% if b.total1 != None or c.total1 != None %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ a }}</td>
+                    <td>{% if b.total1 == None %}{%else%}{{ b.total1 }}{% endif %}</td>
+                    <td>{% if c.total1 == None %}{%else%}{{ c.total1 }}{% endif %}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <th scope="row">الإجمالي</th>
+        <td></td>
+        <td>{{ total_out.total1 }}</td>
+        <td>{{ total_in.total1 }}</td>
+      </tr>
+    </tfoot>
+</table>
+
+{% endblock %}

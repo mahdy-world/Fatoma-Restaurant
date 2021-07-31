@@ -1,0 +1,82 @@
+{% extends 'Website/base.html' %}
+{% block head %}
+    <style>
+        .pagination {
+            position: absolute;
+            text-align: center;
+            align-content: center;
+            align-self: center;
+            align-items: center;
+            bottom: 0px;
+            margin: auto;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    {% if object_list %}
+        {% for product in object_list %}
+            <div class="col-lg-3">
+                <div class="card">
+                <a href="{% url 'Website:ProductView' product.id %}">
+                    <div class="card-header bg-primary">
+                        {{ product.name }}
+                    </div>
+                    <div class="card-body">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="productImage">
+                        {% else %}
+                            <i class="fa fa-5x fa-image productImage"></i>
+                        {% endif %}
+                        <div id="product_price" class="badge bg-primary">
+                            {{ product.sell_price|floatformat }}
+                            جنيه
+                        </div>
+                    </div>
+                </a>
+                    <div class="card-footer">
+                        <div id="product_buttons">
+                            {% if request.user.is_authenticated %}
+                            <a href="{% url 'Website:AddToCart' %}?product={{ product.id }}"
+                               class="btn btn-block btn-success bg-primary" data-toggle="modal"
+                               data-target="#sub_modal">
+                                <i class="fa fa-shopping-cart"></i>
+                                إضافة للسلة
+                            </a>
+                            {% else %}
+                            <a href="{% url 'Auth:UserLogin' %}"
+                               class="btn btn-block btn-success bg-primary" data-toggle="modal"
+                               data-target="#sub_modal">
+                                <i class="fa fa-shopping-cart"></i>
+                                إضافة للسلة
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="login-container">
+            <span class="label label-alert">
+                عفواً لا يوجد منتجات تحت هذا التصنيف
+            </span>
+        </div>
+    {% endif %}
+
+
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">السابق</a>
+                {% endif %}
+                <span class="page-current">
+                    صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">التالي</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}

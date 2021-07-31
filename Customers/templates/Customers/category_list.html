@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% if perms.Customers.add_customer_category %}
+        <div class="col-lg-12">
+            <a href="{% url 'Customers:CategoryCreate' %}" class="btn btn-success btn-block" data-toggle="modal"
+               data-target="#sub_modal">
+                <i class="fa fa-plus-circle"></i>
+                إضافة
+            </a>
+        </div>
+    {% endif %}
+    {% if perms.Customers.access_customer_category_menu %}
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-th-list"></i>
+                    شرائح العملاء
+                    {% if perms.Customers.download_customer_category_data %}
+                    <a href="{% url 'Customers:CategoryXls' %}" class="btn btn-outline-danger btn-sm" style="float: left;"> 
+                        <i class="fas fa-file-excel"></i>
+                            تنزيل البيانات
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-responsive table-hover">
+                            <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>الاسم</td>
+                                <td>
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <form method="get" action="#">
+                                    <td>
+                                        <input type="number" class="form-control input-xs" name="id">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control input-xs" name="name">
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-block btn-xs bg-primary">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </td>
+                                </form>
+                            </tr>
+                            {% for x in object_list %}
+                                <tr>
+                                    <td>{{ x.id }}</td>
+                                    <td>{{ x.name }}</td>
+                                    <td>
+                                        {% if perms.Customers.edit_customer_category %}
+                                            <a href="{% url 'Customers:CategoryUpdate' x.id %}" class="btn-sm btn-info"
+                                               title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                        {% endif %}
+
+                                        {% if perms.Customers.delete_customer_category %}
+                                            <a href="{% url 'Customers:CategoryDelete' x.id %}"
+                                               class="btn-sm btn-danger"
+                                               title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% if is_paginated %}
+                    <div class="card-footer">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                    </li>
+                                {% else %}
+                                    <li class="disabled page-item"><span class="page-link">&laquo;</span></li>
+                                {% endif %}
+                                {% for i in paginator.page_range %}
+                                    {% if page_obj.number == i %}
+                                        <li class="active page-item"><span class="page-link">{{ i }} <span
+                                                class="sr-only">(current)</span></span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if page_obj.has_next %}
+                                    <li class="page-item"><a class="page-link"
+                                                             href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                    </li>
+                                {% else %}
+                                    <li class="disabled page-item"><span class="page-link">&raquo;</span></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

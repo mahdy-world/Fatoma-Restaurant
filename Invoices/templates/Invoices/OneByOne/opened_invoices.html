@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header p-0 border-bottom-0">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    {% for x in opened_invoices %}
+                        <li class="nav-item">
+                            <a href="{% url 'Invoices:show_invoice' x.id %}"
+                               class="nav-link btn btn-{% if x.id == invoice.id %}primary{% else %}info{% endif %}">
+                                {{ x.id }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                    <li class="nav-item">
+                        <a href="{% url 'Invoices:make_invoice' type %}"
+                           class="nav-link btn btn-success">
+                            <i class="fa fa-plus-circle"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

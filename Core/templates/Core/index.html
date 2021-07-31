@@ -1,0 +1,718 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+    <!-- Stock Search -->
+        {% if perms.HR.show_sales_value %}
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3 id="today_sales">{% if today_sales.total %}{{ today_sales.total }}{% else %}0{% endif %}</h3>
+
+                    <p>مبيعات اليوم</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-bag"></i>
+                </div>
+                <!-- <a href="#" class="small-box-footer">المزيد  <i class="fas fa-arrow-circle-right"></i></a> -->
+            </div>
+        </div>
+        {% endif %}
+        <!-- ./col -->
+        {% if perms.HR.show_today_calls %}
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{% if today_calls %}{{ today_calls }}{% else %}0{% endif %}</h3>
+
+                    <p>مكالمات اليوم</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-stats-bars"></i>
+                </div>
+                <!-- <a href="#" class="small-box-footer">المزيد  <i class="fas fa-arrow-circle-right"></i></a> -->
+            </div>
+        </div>
+        {% endif %}
+        <!-- ./col -->
+        {% if perms.HR.show_number_of_new_clients %}
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{% if new_customers %}{{ new_customers }}{% else %}0{% endif %}</h3>
+
+                    <p>عملاء جدد هذا الشهر</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-person-add"></i>
+                </div>
+                <!-- <a href="#" class="small-box-footer">المزيد  <i class="fas fa-arrow-circle-right"></i></a> -->
+            </div>
+        </div>
+        {% endif %}
+        <!-- ./col -->
+        {% if perms.HR.show_expenses_value %}
+        <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3 id="today_expenses">{% if today_expenses.total %}{{ today_expenses.total }}{% else %}0{% endif %}</h3>
+
+                    <p>مصروفات اليوم</p>
+                </div>
+                <div class="icon">
+                    <i class="ion ion-pie-graph"></i>
+                </div>
+                <!-- <a href="#" class="small-box-footer">المزيد  <i class="fas fa-arrow-circle-right"></i></a> -->
+            </div>
+        </div>
+        {% endif %}
+        <!-- ./col -->
+
+    <!-- TO DO List -->
+    {% if request.user.has_access_to_calendar %}
+    <div class="col-lg-6" >
+        <div class="card"  style="height: 410px; overflow: auto;">
+            <div class="card-header">
+            <h3 class="card-title">
+                <i class="ion ion-clipboard mr-1"></i>
+                المهام
+            </h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+            <ul class="todo-list" data-widget="todo-list">
+                <label>المهام العامة</label>
+                {% for x in public_tasks %}
+                <li>
+                <!-- drag handle -->
+                <span class="handle">
+                    <i class="fas fa-ellipsis-v"></i>
+                    <i class="fas fa-ellipsis-v"></i>
+                </span>
+                <!-- checkbox -->
+                <div  class="icheck-primary d-inline ml-2">
+
+                    {% if perms.Calendar.end_task %}
+                    <a href="{% url 'Calendar:TaskDone' x.id %}" 
+                        title="تم" data-toggle="modal" data-target="#sub_modal">
+                        <input type="checkbox" value="" name="todo{{ x.id }}" id="todoCheck{{ x.id }}"  >
+                    </a>
+                    <label for="todoCheck{{ x.id }}"></label>
+                    {% endif %}
+
+                </div>
+                <!-- todo text -->
+                <a href="{% url 'Calendar:TaskView' x.id %}">
+                        <span class="text">{{ x.comment }}</span>
+                </a>
+                {% if x.is_overdue %}
+                    <small class="badge badge-danger"><i class="far fa-clock"></i>متأخر </small>
+                {% endif %}
+                
+                {% if x.is_today %}
+                    <small class="badge badge-warning"><i class="far fa-clock"></i> يوم واحد</small>
+                {% endif %}
+                
+                
+                <div class="tools">
+                    {% if perms.Calendar.end_task %}
+                    <a href="{% url 'Calendar:TaskUpdate' x.id %}" 
+                        title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                    {% if perms.Calendar.delete_task %}
+                    <a href="{% url 'Calendar:TaskDelete' x.id %}" class="danger"
+                        title="حذف" data-toggle="modal" data-target="#sub_modal">
+                            <i class="fas fa-trash" style="color:red;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                </li>
+                {% endfor %}
+                <hr>
+                <label>المهام الخاصة</label>
+                {% for x in private_tasks %}
+                <li>
+                <!-- drag handle -->
+                <span class="handle">
+                    <i class="fas fa-ellipsis-v"></i>
+                    <i class="fas fa-ellipsis-v"></i>
+                </span>
+                <!-- checkbox -->
+                <div  class="icheck-primary d-inline ml-2">
+                    {% if perms.Calendar.end_task %}
+                    <a href="{% url 'Calendar:TaskDone' x.id %}" 
+                        title="تم" data-toggle="modal" data-target="#sub_modal">
+                        <input type="checkbox" value="" name="todo{{ x.id }}" id="todoCheck{{ x.id }}"  >
+                    </a>
+                    <label for="todoCheck{{ x.id }}"></label>
+                    {% endif %}
+                </div>
+                <!-- todo text -->
+                <a href="{% url 'Calendar:TaskView' x.id %}">
+                        <span class="text">{{ x.comment }}</span>
+                </a>
+                {% if x.is_overdue %}
+                    <small class="badge badge-danger"><i class="far fa-clock"></i>متأخر </small>
+                {% endif %}
+                
+                {% if x.is_today %}
+                    <small class="badge badge-warning"><i class="far fa-clock"></i> يوم واحد</small>
+                {% endif %}
+                
+                <div class="tools">
+                    {% if perms.Calendar.end_task %}
+                    <a href="{% url 'Calendar:TaskUpdate' x.id %}" 
+                        title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                    {% if perms.Calendar.delete_task %}
+                    <a href="{% url 'Calendar:TaskDelete' x.id %}"
+                        title="حذف" data-toggle="modal" data-target="#sub_modal">
+                            <i class="fas fa-trash" style="color:red;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                </li>
+                {% endfor %}
+                
+            </ul>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer clearfix">
+            {% if perms.Calendar.add_task %}
+            <a href="{% url 'Calendar:TaskCreate' %}" class="btn btn-primary  float-right " data-toggle="modal"data-target="#sub_modal">
+                <i class="fa fa-plus-circle"></i>
+                إضافة
+            </a>
+            {% endif %}
+            
+            </div>
+        </div>
+      <!-- /.card -->
+    </div>
+    {% endif %}
+
+    <!-- Sales per day Chart -->
+    {% if perms.HR.show_number_of_sales_per_day %}
+    <div class="col-lg-6">
+        <div class="card ">
+            <div class="card-header border-0">
+            <h3 class="card-title">
+                <i class="fas fa-th mr-1"></i>
+                عدد المبيعات لكل يوم
+            </h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+                </button>
+                <!-- <button type="button" class="btn bg-info btn-sm" data-card-widget="remove">
+                <i class="fas fa-times"></i>
+                </button> -->
+            </div>
+            </div>
+            <div class="card-body">
+            <!-- <canvas class="chart" id="line-chart" style="min-height: 200px; height: 200px; max-height: 200px; max-width: 100%;"></canvas> -->
+            <div id="chartContainer" style="width:100%; height: 290px;"></div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer bg-transparent">
+            
+            <!-- /.row -->
+            </div>
+            <!-- /.card-footer -->
+        </div>
+        <!-- /.card -->
+    </div>
+    {% endif %}
+
+    <!--chat-->
+    <div class="col-lg-6">
+        <!-- USERS LIST -->
+        <div class="card card-lightblue " style="height: 420px; overflow: auto;">
+            <div class="card-header">
+                <h3 class="card-title">الدردشة المباشرة</h3>
+    
+                <div class="card-tools">
+                    <span class="badge badge-danger">{{users.count}}</span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0" id ="all_users">
+                <ul class="users-list clearfix" style="padding: 20px;">
+                    <!--online users-->
+                    {% for user in on %}
+                    <li>
+                        <a href="{% url 'Chat:chat' request.user.id  user.user.id %}" data-toggle='modal' data-target="#sub_modal">
+                            <img src="{% static 'AdminLTE/dist/img/user1-128x128.jpg' %}" alt="User Image">
+    
+                            {% if user.user.get_full_name %}
+                                <span class="users-list-date">{{user.user.get_full_name}}</span>
+                            {% else %}
+                                <span class="users-list-date">{{user.user.username}}</span>
+                            {% endif %}
+    
+                            {% for x in all %}
+                                {% if x.is_read == False %}
+                                    <span class="users-list-date" >{{x.message | truncatewords:5 }} <i class="fas fa-circle" style="color: rgb(8, 107, 153);"></i></span> 
+                                {% endif %}
+    
+                                {% if x.is_read == True %}
+                                    <span class="users-list-date" >{{x.message |  truncatewords:5}} <i class="fas fa-check-double"></i></i></span>
+                                {% endif %}                        
+                            {% endfor %}
+                            <div class="badge badge-success">Online</div>
+                        </a>
+                    </li> 
+                    {% endfor %}
+                    <!--Offline users-->
+                    {% for user in off %}
+                    <li>
+                        <a href="{% url 'Chat:chat' request.user.id  user.user.id %}" data-toggle='modal' data-target="#sub_modal">
+                            <img src="{% static 'AdminLTE/dist/img/user1-128x128.jpg' %}" alt="User Image">
+                            
+                            {% if user.user.get_full_name %}
+                                
+                            <span class="users-list-date">{{user.user.get_full_name}}</span>
+                            <span class="users-list-date">{{message.message}}</span>
+                                
+                               
+                            {% else %}
+                                <span class="users-list-date">{{user.user.username}}</span>
+                            {% endif %}
+    
+                            {% for x in all %}
+                                {% if x.is_read == False %}
+                                    <span class="users-list-date" >{{x.message | truncatewords:5 }} <i class="fas fa-circle" style="color: rgb(8, 107, 153);"></i></span> 
+                                {% endif %}
+
+                                {% if x.is_read == True %}
+                                    <span class="users-list-date" >{{x.message |  truncatewords:5}} <i class="fas fa-check-double"></i></i></span>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="users-list-date" ><i class="fas fa-clock"></i></i>{{user.last_activity|timesince}}</span>
+                                
+                        </a>
+                    </li>
+                    {% endfor %}               
+                </ul>
+                <!-- /.users-list -->
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer text-center">
+                <a href="javascript:" style="color: white;">View All Users</a>
+            </div>
+            <!-- /.card-footer -->
+        </div>
+        <!--/.card -->
+    </div>
+    
+    {% if perms.HR.show_percentage_of_sales_to_expenses %}
+    <!-- Sales to Expense Ratio Chart -->
+    <div class="col-lg-6">
+        <div class="card ">
+            <div class="card-header border-0">
+            <h3 class="card-title">
+                <i class="fas fa-th mr-1"></i>
+                نسبة المبيعات للمصروفات
+            </h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+                </button>
+                <!-- <button type="button" class="btn bg-info btn-sm" data-card-widget="remove">
+                <i class="fas fa-times"></i>
+                </button> -->
+            </div>
+            </div>
+            <div class="card-body">
+            <!-- <canvas class="chart" id="line-chart" style="min-height: 200px; height: 200px; max-height: 200px; max-width: 100%;"></canvas> -->
+            <div id="chartContainer1" style="width:100%; height: 300px;"></div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer bg-transparent">
+            
+            <!-- /.row -->
+            </div>
+            <!-- /.card-footer -->
+        </div>
+        <!-- /.card -->
+    </div>
+    {% endif %}
+    
+    {% if perms.HR.stock_search %}
+    <!-- Stock Search -->
+    <div class="col-lg-6">
+        <!-- Stock Search -->
+        <div class="card">
+            <div class="card-header">
+                بحث عن مخزون
+            </div>
+            <div class="card-body">
+                <!-- Barcode Search -->
+                <form class="form-inline" method="get" action="{% url 'Reports:ItemStockReport' %}">
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                        <input name="item" placeholder="بحث بالكود">
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                        <button type="submit" name="submit" value="1" class="btn btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Name Search -->
+                <form class="form-inline" method="get" action="{% url 'Reports:ItemStockReport' %}">
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                        <select name="item">
+                            {% for x in products %}
+                                <option value="{{ x.id }}">
+                                    {{ x }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                        <button type="submit" name="submit" value="1" class="btn btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if perms.HR.product_search %}
+    <!-- Product Search -->
+    <div class="col-lg-6">
+        <!-- Product Search -->
+        <div class="card">
+            <div class="card-header">
+                بحث عن منتج
+            </div>
+            <div class="card-body">
+                <!-- Barcode Search -->
+                <form class="form-inline" method="get" action="{% url 'Products:ProductList' %}">
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                        <input name="id" placeholder="بحث بالكود">
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                        <button type="submit" name="submit" value="1" class="btn btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Name Search -->
+                <form class="form-inline" method="get" action="{% url 'Products:ProductList' %}">
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                        <input name="name" placeholder="بحث بالإسم">
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                        <button type="submit" name="submit" value="1" class="btn btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if perms.HR.employee_search %}
+    <!-- Customer/Supplier Search -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                بحث عن عميل/مورد
+            </div>
+            <div class="card-body">
+                <form class="form-inline" method="get" action="{% url 'Customers:CustomerList' %}">
+                    <!-- Name Search -->
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                        <input name="name" placeholder="بحث بالاسم">
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                        <button type="submit" name="submit" value="1" class="btn btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <!-- Phone Search -->
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                        <input name="phone" placeholder="بحث برقم التليفون">
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                        <button type="submit" name="submit" value="1" class="btn btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <!-- Address Search -->
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                        <input name="address" placeholder="بحث بالعنوان">
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                        <button type="submit" name="submit" value="1" class="btn btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if perms.HR.show_open_invoices %}
+    <!-- Opened Invoices -->
+    <div class="col-lg-6">
+        <div class="card"  style="height: 200px; overflow: auto;">
+            <div class="card-header">
+                فواتير مفتوحة
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <td>
+                            الفاتورة
+                        </td>
+                        <td>
+                            قيمة الفاتورة
+                        </td>
+                        </thead>
+                        <tbody>
+                        {% for x in opened_invoices %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'Invoices:show_invoice' x.id %}">
+                                        {{ x }}
+                                    </a>
+                                </td>
+                                <td>{{ x.total }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Private Tasks -->
+    <!-- <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                مهام خاصة
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <td>
+                            التاريخ
+                        </td>
+                        <td>
+                            المحتوي
+                        </td>
+                        <td>
+                            متعلقة بـ
+                        </td>
+                        <td></td>
+                        </thead>
+                        <tbody>
+                        {% for x in private_tasks %}
+                            <tr>
+                                <td>
+                                    {{ x.date.isoformat }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'Calendar:TaskView' x.id %}">
+                                        {{ x }}
+                                    </a>
+                                </td>
+                                <td>{{ x.related_to }}</td>
+                                <td>
+
+                                    <a href="{% url 'Calendar:TaskDone' x.id %}" class="btn-sm btn-success"
+                                       title="تم" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-check"></i>
+                                    </a>
+                                    <a href="{% url 'Calendar:TaskUpdate' x.id %}" class="btn-sm btn-info"
+                                       title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    {% if x.task_type == 1 %}
+                                        <a href="{% url 'Calendar:TaskTransfer' x.id %}" class="btn-sm btn-warning"
+                                           title="تحويل" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-exchange-alt"></i>
+                                        </a>
+                                    {% endif %}
+                                    <a href="{% url 'Calendar:TaskDelete' x.id %}" class="btn-sm btn-danger"
+                                       title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Public Tasks -->
+    <!-- <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                مهام عامة
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <td>
+                            التاريخ
+                        </td>
+                        <td>
+                            المحتوي
+                        </td>
+                        <td>
+                            متعلقة بـ
+                        </td>
+                        </thead>
+                        <tbody>
+                        {% for x in public_tasks %}
+                            <tr>
+                                <td>
+                                    {{ x.date.isoformat }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'Calendar:TaskView' x.id %}">
+                                        {{ x }}
+                                    </a>
+                                </td>
+                                <td>{{ x.related_to }}</td>
+                                <td>
+
+                                    <a href="{% url 'Calendar:TaskDone' x.id %}" class="btn-sm btn-success"
+                                       title="تم" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-check"></i>
+                                    </a>
+                                    <a href="{% url 'Calendar:TaskUpdate' x.id %}" class="btn-sm btn-info"
+                                       title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    {% if x.task_type == 1 %}
+                                        <a href="{% url 'Calendar:TaskTransfer' x.id %}" class="btn-sm btn-warning"
+                                           title="تحويل" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-exchange-alt"></i>
+                                        </a>
+                                    {% endif %}
+                                    <a href="{% url 'Calendar:TaskDelete' x.id %}" class="btn-sm btn-danger"
+                                       title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+
+    <!-- Website Invoices -->
+    <!-- <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                طلبات الموقع
+            </div>
+            <div class="card-body">
+
+            </div>
+        </div>
+    </div> -->
+
+
+{% endblock %}
+
+{% block js %}
+
+<!--Ajax request every 1 min update user last seen-->
+<script>
+    setInterval(function() {
+        $( document ).ready( function() {
+            $( '#all_users' ).html( '&nbsp;' ).load( "{% url 'Chat:users' %}");
+        });
+  }, 60000); 
+</script>
+
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script type="text/javascript">
+
+        var chart1 = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            theme: "light1",
+            title:{
+                text: ""
+            },
+            data: [{        
+                type: "line",
+                indexLabelFontSize: 17,
+                dataPoints: [
+                    {% regroup sales by date.date.isoformat as sales_by_day %}
+                    {% for x in sales_by_day %}
+                        {
+                            y: {{ x.list|length }},
+                            label: "{{ x.grouper }}"
+                        }{% if not forloop.last %},{% endif %}
+
+                    {% endfor %}
+                ]
+            }]
+            });
+            chart1.render();
+
+        var total_sales = parseFloat(document.getElementById('today_sales').innerHTML)
+        var total_expenses = parseFloat(document.getElementById('today_expenses').innerHTML)
+        var chart2 = new CanvasJS.Chart("chartContainer1", {
+            theme: "light2",
+            exportEnabled: true,
+            animationEnabled: true,
+            title: {
+                text: ""
+            },
+            data: [{
+                type: "pie",
+                startAngle: 25,
+                toolTipContent: "<b>{label}</b>: {y}%",
+                showInLegend: "true",
+                legendText: "{label}",
+                indexLabelFontSize: 16,
+                indexLabel: "{label} - {y}%",
+                dataPoints: [
+                    { y: total_sales , label: "مبيعات" },
+                    { y: total_expenses , label: "مصروفات" }
+                ]
+            }]
+        });
+        chart2.render();
+
+</script>
+
+{% endblock %}

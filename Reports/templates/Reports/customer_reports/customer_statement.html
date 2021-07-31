@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12 dont-print">
+        <div class="card">
+            <div class="card-header">
+                تقارير فواتير
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" method="get" action="#">
+                    <input name="type" type="hidden" value="{{ request.GET.type }}">
+                    {{ form }}
+                    <button name="submit" class="btn btn-success" type="submit" value="1"><i
+                            class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <td>#</td>
+            <td>التاريخ</td>
+            <td>بيان</td>
+            <td>الخزينة</td>
+            <td>له</td>
+            <td>عليه</td>
+            </thead>
+            <tbody>
+            <tr>
+                <td>0</td>
+                <td></td>
+                <td>رصيد افتتاحي</td>
+                <td></td>
+                <td>{{ initial_balance.total_debit }}</td>
+                <td>{{ initial_balance.total_credit }}</td>
+            </tr>
+            {% for x in object_list %}
+                <tr>
+                    <td>{{ x.id }}</td>
+                    <td>{{ x.date.astimezone.date.isoformat }}</td>
+                    <td>{{ x }}</td>
+                    <td>{{ x.treasury }}</td>
+                    <td>{{ x.customer_debit }}</td>
+                    <td>{{ x.customer_credit }}</td>
+                </tr>
+                {% if request.GET.report_type == '2' %}
+                    {% if x.invoiceitem_set.all.count > 0 %}
+                        <tr style="background-color: lightgray;">
+                            <td>#</td>
+                            <td>المنتج</td>
+                            <td>الكمية</td>
+                            <td>سعر الوحدة</td>
+                            <td>خصم</td>
+                            <td>إجمالي</td>
+                        </tr>
+                        {% for y in x.invoiceitem_set.all %}
+                        <tr style="background-color: lightgray;">
+                                <td>{{ y.id }}</td>
+                                <td>{{ y.item }}</td>
+                                <td>{{ y.quantity }}</td>
+                                <td>{{ y.unit_price }}</td>
+                                <td>{{ y.discount }}</td>
+                                <td>{{ y.after_discount }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr style="background-color: lightgray;">
+                            <td></td>
+                            <td>إجمالي</td>
+                            <td></td>
+                            <td></td>
+                            <td>{{ x.discount }}</td>
+                            <td>{{ x.after_discount }}</td>
+                        </tr>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            <tr>
+                <td>{{ summary.count }}</td>
+                <td></td>
+                <td>إجمالي</td>
+                <td></td>
+                <td>{{ summary.total_debit }}</td>
+                <td>{{ summary.total_credit }}</td>
+            </tr>
+            <tr>
+                <td>{{ summary.count }}</td>
+                <td></td>
+                <td>الرصيد</td>
+                <td></td>
+                <td>{{ summary.total }}</td>
+                <td></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block body %}
+    <!-- تقارير الفواتير -->
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list-alt"></i> تقارير الفواتير
+            </div>
+            <div class="card-body">
+                <a href="{% url 'Reports:InvoiceReport' %}?type=1" class="btn btn-block">
+                    فواتير المبيعات
+                </a>
+                <a href="{% url 'Reports:InvoiceReport' %}?type=5" class="btn btn-block">
+                    فواتير المشتريات
+                </a>
+                <a href="{% url 'Reports:InvoiceReport' %}?type=4" class="btn btn-block">
+                    فواتير مرتجع المبيعات
+                </a>
+                <a href="{% url 'Reports:InvoiceReport' %}?type=6" class="btn btn-block">
+                    فواتير مرتجع المشتريات
+                </a>
+                <a href="{% url 'Reports:InvoiceReport' %}?type=7" class="btn btn-block">
+                    عروض الاسعار
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- تقارير الخزائن -->
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list-alt"></i> تقارير الخزائن
+            </div>
+            <div class="card-body">
+                <a href="{% url 'Reports:TreasuryBalanceReport' %}" class="btn btn-block">
+                    أرصدة الخزائن
+                </a>
+                <a href="{% url 'Reports:TreasuryTransactionReport' %}" class="btn btn-block">
+                    حركات الخزائن
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- تقارير المنتجات -->
+    <div class="col-lg-3">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list-alt"></i> تقارير الخزائن
+            </div>
+            <div class="card-body">
+                <a href="{% url 'Reports:ItemStockReport' %}" class="btn btn-block">
+                    رصيد منتج
+                </a>
+                <a href="{% url 'Reports:TreasuryTransactionReport' %}" class="btn btn-block">
+                    رصيد مخزن
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

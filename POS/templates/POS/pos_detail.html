@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="col-lg-2 mt-3">
+    <!-- POS Card Start -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-list"></i>
+            معلومات نقطة البيع
+        </div>
+        <div class="card-body">
+            <table class="table table-responsive table-hover">
+                <tr>
+                    <td>
+                        الاسم
+                    </td>
+                    <td>
+                        {{ object.name }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        النوع
+                    </td>
+                    <td>
+                        {{ object.get_type_display }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        تابع لمخزن
+                    </td>
+                    <td>
+                        {{ object.warehouse }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        انشأ بواسطة
+                    </td>
+                    <td>
+                        {{ object.createdBy }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        عدد الطاولات المتاحة 
+                    </td>
+                    <td>
+                        {{ open_tables_count }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <a class="nav-link" href="{% url 'POS:PosReport' object.id %}">
+                            <i class="fas fa-file-alt"></i>
+                            تقرير نقطة البيع
+                            <i class="right fas fa-angle-left"></i>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!-- POS Card End -->
+</div>
+
+<div class="col-lg-10 mt-3">
+    <!-- Open Shift Card Start -->
+    {% if perms.POS.view_closed_shift %}
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list-alt"></i>
+                    الشيفتات المفتوحة
+                <span class="float-left dont-print">
+                    {% if perms.POS.add_shift and open_shifts|length == 0 %}
+                    <a href="{% url 'POS:ShiftCreate' object.id %}" class="btn-sm btn-success" title="إضافة"
+                    data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-plus-circle"></i>
+                    </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </span>
+            </div>
+
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <th>#</th>
+                        <th> التاريخ</th>
+                        <th>وقت البداية</th>
+                        <th>وقت النهاية</th>
+                        <th>الموظف</th>
+                        <th>رقم الكاشير</th>
+                        <th>حالة الشيفت</th>
+                        <th class="text-center"></th>
+                    </thead>
+                    <tbody>
+                        {% for x in open_shifts %}
+                            <tr>
+                                <td>{{ x.id }}</td>
+                                <td>{{ x.date }}</td>
+                                <td>{{ x.start_time }}</td>
+                                <td>{{ x.end_time }}</td>
+                                <td>{{ x.employee }}</td>
+                                <td>{{ x.cashier_no }}</td>
+                                <td>{{ x.get_status_display }}</td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        {% if perms.POS.view_shift %}
+                                        <a href="{% url 'POS:ShiftCard' x.id %}" class="btn btn-success"
+                                        title="عرض">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if perms.POS.close_shift %}
+                                            {% if x.pos.shift_lock == False %}
+                                            <a href="{% url 'POS:EndShift' x.id  %}" class="btn btn-secondary"
+                                            title="إغلاق" >
+                                            <i class="far fa-window-close"></i>
+                                            </a>
+                                            {% else %}
+                                            <a class="btn btn-secondary" data-toggle="modal" data-target="#shiftLockModal{{ x.id }}" title="إغلاق">
+                                                <i class="far fa-window-close"></i>
+                                            </a>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if perms.POS.delete_shift %}
+                                        <a href="{% url 'POS:ShiftDelete' x.id object.id %}" class="btn btn-danger"
+                                        title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            <!--MODEl-->
+                            <div class="modal fade" id="shiftLockModal{{ x.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="shiftLockLabel">تأكيد إغلاق الشيفت</h5>
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        </div>
+                                        <div class="modal-body" id="shiftLockModal_body">
+                                        <input placeholder="ادخل كلمة السر الخاصة بنقطة البيع" type="password" id="shiftLockPassword{{ x.id }}">
+                                        <div id="shiftLockPasswordalert{{ x.id }}" class="alert alert-danger" role="alert" hidden>
+                                            كلمة السر غير صحيحة
+                                        </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button id="shiftLockbutton" type="button" class="btn btn-primary" onclick="EndShift('{{ object.password }}','{{ x.id }}')">إغلاق الشيفت</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--MODEl-->
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> 
+        </div>
+    {% endif %}
+    <!-- Open Shift Card End -->
+
+    <!-- Closed Shift Card Start -->
+    {% if perms.POS.view_open_shift %}
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list-alt"></i>
+                الشيفتات المغلقة
+                <span class="float-left dont-print">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </span>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <th>#</th>
+                        <th> التاريخ</th>
+                        <th>وقت البداية</th>
+                        <th>وقت النهاية</th>
+                        <th>الموظف</th>
+                        <th>رقم الكاشير</th>
+                        <th>حالة الشيفت</th>
+                        <th class="text-center"></th>
+                    </thead>
+                    <tbody>
+                        {% for x in closed_shifts %}
+                            <tr>
+                                <td>{{ x.id }}</td>
+                                <td>{{ x.date }}</td>
+                                <td>{{ x.start_time }}</td>
+                                <td>{{ x.end_time }}</td>
+                                <td>{{ x.employee }}</td>
+                                <td>{{ x.cashier_no }}</td>
+                                <td>{{ x.get_status_display }}</td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        {% if perms.POS.view_shift_report %}
+                                        <a href="{% url 'POS:Report' x.id %}" class="btn btn-success"
+                                        title="عرض تقرير الشيفت">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if perms.POS.delete_shift %}
+                                        <a href="{% url 'POS:ShiftDelete' x.id object.id %}" class="btn btn-danger"
+                                        title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+    
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> 
+        </div>
+    {% endif %}
+    <!-- Closed Shift Card End -->
+
+    {% if object.type == 1 and perms.POS.view_floor %}
+        <!-- Floor Card Start -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-list-alt"></i>
+                الأدوار
+                <span class="float-left dont-print">
+                    {% if perms.POS.add_floor %}
+                    <a href="{% url 'POS:FloorCreate' object.id %}" class="btn-sm btn-success" title="إضافة"
+                        data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-plus-circle"></i>
+                    </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </span>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <th>#</th>
+                        <th> اسم الدور</th>
+                        <th class="text-center"></th>
+                    </thead>
+                    <tbody>
+                        <div id="accordion">
+                            {% for f in floors %}
+                            <tr>
+                                <td> {{ forloop.counter0 }} </td>
+                                <td>
+                                    <div class="card">
+                                        <button class="btn btn-link" data-toggle="collapse" data-target="#floor{{ f.id }}" aria-expanded="false" aria-controls="collapseOne">
+                                            <div class="card-header" id="header{{ f.id }}">
+                                                <h5 class="mb-0">
+                                                    {{ f.name }}    
+                                                </h5>
+                                            </div>
+                                        </button>
+                               
+                                        <div id="floor{{ f.id }}" class="collapse" data-parent="#accordion">
+                                            <div class="card-body">
+                                                {% for t in tables %}
+                                                    {% if t.floor.id == f.id %}
+                                                        {% if t.status == 1 %}
+                                                            <a data-toggle="modal" data-target="#TableInfo{{t.id}}">
+                                                                <i class="fas fa-life-ring m-3" style='font-size:30px;color:blue' title="{{ t.name }}"></i>
+                                                            </a>
+                                                        {% elif t.status == 2 %}
+                                                            <a data-toggle="modal" data-target="#TableInfo{{t.id}}">
+                                                                <i class="fas fa-life-ring m-3" style='font-size:30px;color:red' title="{{ t.name }}"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        {% if perms.POS.add_table %}
+                                        <a href="{% url 'POS:TableCreate' f.id %}" class="btn btn-success"
+                                            title="إضافة طاولة" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa  fa-plus-circle"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if perms.POS.delete_floor %}
+                                        <a href="{% url 'POS:FloorDelete' f.id %}" class="btn btn-danger"
+                                            title="حذف">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}     
+                        </div>
+                    </tbody>
+                </table>
+            </div> 
+        </div>
+        <!-- Floor Card End -->
+    {% endif %}
+
+    {% for t in tables %}
+    <div class="modal fade" id="TableInfo{{t.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                
+                <div class="modal-body" id="modal_body">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fa fa-list"></i>
+                                بيانات الطاولة
+                            </div>
+                            <table class="table table-responsive shiftInfo">
+                                <tr>
+                                    <td>
+                                         رقم الطاولة
+                                    </td>
+                                    <td>
+                                        {{ t.name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        حالة الطاولة
+                                    </td>
+                                    <td>
+                                        {{ t.get_status_display }}
+                                    </td>
+                                </tr>
+            
+                            </table>
+                        </div>
+                    </div>    
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">رجوع</button>
+                    {% if perms.POS.delete_table %}
+                    <a href="{% url 'POS:TableDelete' t.id %}" class="btn btn-danger">حذف</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+    function EndShift(x, shiftId){
+        password = document.getElementById("shiftLockPassword"+shiftId).value
+        if(password == x){
+            $.ajax({
+            url: '/POS/EndShift/' +shiftId  ,
+            success: function (res)
+            {
+                console.log('1')
+                window.location.href =  `/POS/pos/{{ object.id }}/show/`;
+            }
+            });
+        }else{
+            document.getElementById("shiftLockPasswordalert"+shiftId).removeAttribute("hidden");
+        }
+    }
+</script>
+{% endblock %}

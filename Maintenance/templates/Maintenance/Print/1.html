@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        .container {
+            font-size: {{ setting.text_size|floatformat }}px;
+            padding-top: 50px;
+            padding-bottom: 50px;
+        }
+
+        td {
+            font-size: {{ setting.text_size|floatformat }}px;
+        }
+
+        div.header {
+            display: block;
+            text-align: center;
+            position: running(header);
+        }
+
+        div.footer {
+            display: block;
+            text-align: center;
+            position: running(footer);
+            bottom: 0;
+        }
+
+        @page {
+            @top-center {
+                content: element(header)
+            }
+        }
+
+        @page {
+            @bottom-center {
+                content: element(footer)
+            }
+        }
+
+        td {
+            border: 1px solid black !important;
+        }
+
+        @media print {
+            td {
+                border: 1px solid black !important;
+            }
+
+            div.footer {
+                position: absolute;
+                bottom: 0;
+            }
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="header col-lg-12">
+        <div class="row">
+            <!-- Right -->
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 center-text">
+                {% if setting.logo_location == 1 %}
+                    {% if setting.logo %}
+                        <img src="{{ setting.logo.url }}" width="{{ setting.logo_width|floatformat }}%">
+                    {% else %}
+                        <h5>{{ setting.name }}</h5>
+                    {% endif %}
+                {% else %}
+                    {% if setting.footer1_location == 1 %}
+                        {% if setting.footer1 %}
+                            {{ setting.footer1|linebreaks }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+            <!-- Center -->
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 center-text">
+                <div class="row">
+                    <div class="col-lg-12">
+                        إيصال صيانة رقم
+                        {{ object.id }}
+                    </div>
+                    <div class="col-lg-12">
+                        <img src="{% url 'Barcode:single_generator' object.id %}">
+                    </div>
+                </div>
+            </div>
+            <!-- Left -->
+            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 center-text">
+                {% if setting.logo_location == 2 %}
+                    {% if setting.logo %}
+                        <img src="{{ setting.logo.url }}" width="{{ setting.logo_width|floatformat }}%">
+                    {% else %}
+                        <h5>{{ setting.name }}</h5>
+                    {% endif %}
+                {% else %}
+                    {% if setting.footer1_location == 1 %}
+                        {% if setting.footer1 %}
+                            {{ setting.footer1|linebreaks }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <table class="table">
+            <tr>
+                <td>التاريخ</td>
+                <td>{{ object.date.date.isoformat }}</td>
+            </tr>
+            <tr>
+                <td>الاسم</td>
+                <td>{{ object.customer }}</td>
+            </tr>
+            <tr>
+                <td>نوع الجهاز</td>
+                <td>{{ object.product }}</td>
+            </tr>
+            <tr>
+                <td>سيريال</td>
+                <td>{{ object.serial }}</td>
+            </tr>
+            <tr>
+                <td>المشكلة</td>
+                <td>{{ object.problem|linebreaks }}</td>
+            </tr>
+            <tr>
+                <td>نوع الصيانة</td>
+                <td>{{ object.get_maintenance_type_display }}</td>
+            </tr>
+        </table>
+        <table class="table">
+        </table>
+    </div>
+    {% if setting.print_invoice_comments %}
+        {% if object.comment %}
+            <div class="col-lg-12">
+                {{ object.comment|linebreaks }}
+            </div>
+        {% endif %}
+    {% endif %}
+    <div class="col-lg-12 footer">
+        <div class="row">
+            {% if setting.footer1_location == 2 %}
+                {% if setting.footer1 %}
+                    <div class="col-lg-12">
+                        {{ setting.footer1|linebreaks }}
+                    </div>
+                {% endif %}
+            {% endif %}
+            {% if setting.footer2 %}
+                <div class="col-lg-12">
+                    {{ setting.footer2|linebreaks }}
+                </div>
+            {% endif %}
+            <div class="col-lg-12" style=" text-align: right;">
+                <small class="small">
+                    تصميم وبرمجة شركة اون لينك لخدمات تكنولوجيا المعلومات
+                    01066440666
+                </small>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        window.print();
+    </script>
+{% endblock %}

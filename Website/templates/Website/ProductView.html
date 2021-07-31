@@ -1,0 +1,54 @@
+{% extends 'Website/base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        <h3>{{ object }}</h3>
+    </div>
+    <div class="col-lg-4 col-md-4">
+        <div class="card">
+            <div class="card-body">
+                {% if object.image %}
+                    <img src="{{ object.image.url }}" class="productImage">
+                {% else %}
+                    <i class="fa fa-5x fa-image productImage"></i>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <div id="product_buttons">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'Website:AddToCart' %}?product={{ object.id }}"
+                           class="btn btn-block btn-success bg-primary" data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-shopping-cart"></i>
+                            إضافة للسلة
+                        </a>
+                    {% else %}
+                        <a href="{% url 'Auth:UserLogin' %}"
+                           class="btn btn-block btn-success bg-primary" data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-shopping-cart"></i>
+                            إضافة للسلة
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div id="tag_list">
+            {% if object.brand %}
+                <a href="{% url 'Website:Search' %}?brand={{ object.brand.id }}" class="badge bg-primary">{{ object.brand }}</a>
+            {% endif %}
+            {% if object.sub_category.main_category %}
+                <a href="{% url 'Website:Search' %}?main_category={{ object.sub_category.main_category.id }}" class="badge bg-primary">{{ object.sub_category.main_category.name }}</a>
+            {% endif %}
+            {% if object.sub_category %}
+                <a href="{% url 'Website:Search' %}?sub_category={{ object.sub_category.id }}" class="badge bg-primary">{{ object.sub_category.name }}</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-8 col-md-8" style="text-align: right;">
+        <h4>
+            {{ object.sell_price|floatformat }} جنيه
+        </h4>
+        <br>
+        {{ object.description|linebreaks }}
+    </div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12 dont-print">
+        <div class="card">
+            <div class="card-header">
+                تقارير الصيانة
+            </div>
+            <div class="card-body">
+                <form class="form-horizontal" method="get" action="#">
+                    {{ form }}
+                    <button name="submit" class="btn btn-success" type="submit" value="1"><i
+                            class="fa fa-search"></i></button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class=" table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <td>#</td>
+                <td>التاريخ</td>
+                <td>العميل</td>
+                <td>المنتج</td>
+                <td>سيريال</td>
+                <td>التكلفة</td>
+                <td>الحالة</td>
+                <td>نوع</td>
+                <td>الطريقة</td>
+                </thead>
+                <tbody>
+                {% for x in object_list %}
+                    <tr>
+                        <td>{{ x.id }}</td>
+                        <td>{{ x.date.astimezone.date.isoformat }}</td>
+                        <td><a href="tel:{{ x.customer.phone }}">{{ x.customer }}</a></td>
+                        <td>{{ x.product }}</td>
+                        <td>{{ x.sn }}</td>
+                        <td>{{ x.cost }}</td>
+                        <td>{{ x.get_status_display }}</td>
+                        <td>{{ x.get_maintenance_type_display }}</td>
+                        <td>{{ x.get_outsource_status_display }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td>{{ summary.count }}</td>
+                    <td>إجمالي</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ summary.total }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

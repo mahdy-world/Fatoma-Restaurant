@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% block container_class %}-fluid{% endblock %}
+{% block body %}
+    <div class="col-lg-4 col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-light">
+                <div class="card-title">{{ invoice }}</div>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <td>
+                        المنتج
+                        {% if invoice.invoice_can_edit %}
+                            <a href="{% url 'Products:ProductCreate' %}" data-toggle="modal"
+                               data-target="#sub_modal"
+                               class="btn-sm btn-success">
+                                <i class="fa fa-plus-circle"></i>
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>الكمية</td>
+                    <td>سعر</td>
+                    <td>إجمالي</td>
+                    </thead>
+                    <tbody>
+                    {% for item in invoice.invoiceitem_set.all %}
+                        <tr>
+                            <td>
+                                {{ item.item }}
+                            </td>
+                            <td>
+                                {{ item.quantity|floatformat }}
+                                {% if invoice.invoice_can_edit %}
+                                    <a href="{% url 'Invoices:edit_invoice_item_quantity' item.id %}"
+                                       class="btn-sm btn-warning dont-print"
+                                       data-toggle="modal" data-target="#action_modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ item.unit_price|floatformat }}
+                                {% if perms.Invoices.edit_item_unit_price %}
+                                    {% if invoice.invoice_can_edit %}
+                                        <a href="{% url 'Invoices:edit_invoice_item_price' item.id %}"
+                                           class="btn-sm btn-warning dont-print"
+                                           data-toggle="modal" data-target="#action_modal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ item.total_price|floatformat }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>إجمالي</td>
+                        <td></td>
+                        <td></td>
+                        <td>{{ invoice.total|floatformat }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card" style="bottom: 0;">
+            <div class="card-body">
+                <div class="row">
+                    <input type="number" name="quantity" id="quantity">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(1)">1</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(2)">2</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(3)">3</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block">كمية</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(4)">4</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(5)">5</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(6)">6</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress()">خصم</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(7)">7</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(8)">8</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(9)">9</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block">سعر</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="increase()">+</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="keypress(0)">0</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="decrease()">-</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-block" onclick="backspace()"><i class="fa fa-backspace"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <a class="btn btn-primary btn-block" href="{% url 'Invoices:edit_invoice_customer' invoice.id %}"
+                           data-toggle="modal" data-target="#sub_modal"><i class="fa fa-user-circle"></i>
+                            {% if invoice.customer %} {{ invoice.customer }}{% else %}عميل{% endif %}</a>
+                        <a class="btn btn-success btn-block" href="{% url 'Invoices:save_invoice' invoice.id %}"
+                           data-toggle="modal" data-target="#sub_modal"><i class="fa fa-dollar-sign"></i> دفع </a>
+                        <a class="btn btn-danger btn-block" href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                           data-toggle="modal" data-target="#sub_modal"><i class="fa fa-trash"></i> حذف </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <form>
+                    <input type="text" placeholder="#" name="id" id="#product_id">
+                    <input type="text" placeholder="#" name="item_id" id="#invoice_item_id">
+                    <input type="text" placeholder="اسم المنتج" name="product_name" id="#product_name">
+                    <input type="text" placeholder="كمية" name="quantity" id="item_quantity">
+                    <input type="text" placeholder="سعر" name="total_price" id="#unit_price">
+                    <input type="text" placeholder="اجمالي" name="total" id="#total">
+                    <input type="text" placeholder="خصم" name="discount" id="#discount">
+                    <input type="text" placeholder="بعد الخصم" name="after_discount" id="#after_discount">
+                    <input type="text" placeholder="اخر سعر بيع" name="last_price" id="#last_price">
+                    <input type="text" placeholder="الكمية الموجودة في الفرع" name="stock_remaining"
+                           id="#stock_remaining">
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8 col-md-8">
+        <div class="card text-center">
+            <div class="card-header bg-primary">
+                <div class="row">
+                    <div class="col-lg-8 col-md-8">
+                        <ul class="nav nav-tabs card-header-tabs">
+                            {% for x in opened_invoices %}
+                                <li class="nav-item">
+                                    <a href="{% url 'Invoices:show_invoice' x.id %}"
+                                       class="nav-link {% if invoice.id == x.id %}active{% endif %}">
+                                        {% if invoice.id == x.id %}
+                                            <i class="badge badge-dark">{{ x.id }}</i> {{ invoice.date.time }}
+                                        {% else %}
+                                            {{ x.id }}
+                                        {% endif %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'Invoices:make_invoice' invoice.invoice_type %}">
+                                    <i class="fa fa-plus-circle"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-3">
+                        <form class="">
+                            <div class="row">
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-10">
+                                    <input type="text" placeholder="بحث ..">
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-2">
+                                    <button type="submit" class="btn-sm"><i class="fa fa-search"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" id="product_list">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-3 col-6">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        /* KeyPad */
+        function keypress(num) {
+            var old_pin = $('#quantity').val();
+            var new_pin = old_pin + num;
+            $('#quantity').val(new_pin);
+        }
+
+        function backspace() {
+            $('#quantity').val(function (index, value) {
+                    return value.substr(0, value.length - 1);
+                }
+            )
+        }
+
+        function increase() {
+            $('#quantity').val(function (i, oldval) {
+                return ++oldval;
+            });
+        }
+
+        function decrease() {
+            $('#quantity').val(function (i, oldval) {
+                return --oldval;
+            });
+        }
+    </script>
+{% endblock %}

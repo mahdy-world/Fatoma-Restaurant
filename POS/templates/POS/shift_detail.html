@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="col-lg-2 mt-3">
+    <!-- Shift Card Start -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-list"></i>
+            معلومات الشيفت
+        </div>
+        <div class="card-body">
+            <table class="table table-responsive table-hover">
+                <tr>
+                    <td>
+                        التاريخ
+                    </td>
+                    <td>
+                        {{ object.date }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        بداية الشيفت
+                    </td>
+                    <td>
+                        {{ object.start_time }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                         نهاية الشيفت
+                    </td>
+                    <td>
+                        {{ object.end_time }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        الموظف
+                    </td>
+                    <td>
+                        {{ object.employee }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        رقم الكاشير
+                    </td>
+                    <td>
+                        {{ object.cashier_no }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        حالة الشيفت
+                    </td>
+                    <td>
+                        {{ object.get_status_display }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        تابع لنقطة بيع
+                    </td>
+                    <td>
+                        {{ object.pos }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <!-- Shift Card End -->
+</div>
+
+<div class="col-lg-10 mt-3">
+    {% if perms.POS.view_open_order %}
+    <!-- Open Order Card Start -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-list-alt"></i>
+                الطلبات المفتوحة
+            <span class="float-left dont-print">
+            {% if perms.POS.add_order %}
+                {% if object.pos.type != 1 %}
+                    <a href="{% url 'POS:OrderCreate' object.id %}" class="btn-sm btn-success" title="إضافة" data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-plus-circle"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'POS:OrderCreate' object.id %}" class="btn-sm btn-success" title="إضافة" data-toggle="modal" data-target="#new_order_modal">
+                        <i class="fa fa-plus-circle"></i>
+                    </a>
+                {% endif %}
+            {% endif %}
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </span>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <th>#</th>
+                    <th> تاريخ و وقت الطلب</th>
+                    <th>اسم العميل</th>
+                    <th>حالة الطلب</th>
+                    <th class="text-center"></th>
+                </thead>
+                <tbody>
+                    {% for x in open_orders %}
+                        <tr>
+                            <td>{{ x.id }}</td>
+                            <td>{{ x.date }}</td>
+                            <td>{{ x.customer }}</td>
+                            <td>{{ x.get_status_display }}</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    {% if perms.POS.view_order %}
+                                    <a href="{% url 'POS:OrderUpdate' x.id %}" class="btn btn-success"
+                                        title="عرض">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if perms.POS.cancel_order %}
+                                    <a href="{% url 'POS:OrderCancel' x.id object.id %}" class="btn btn-secondary"
+                                        title="إلغاء" >
+                                        <i class="far fa-window-close"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if perms.POS.delete_order %}
+                                    <a href="{% url 'POS:OrderDelete' x.id %}" class="btn btn-danger"
+                                        title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Open Order Card End -->
+    {% endif %}
+
+    {% if perms.POS.view_closed_order %}
+    <!-- Closed Order Card Start -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-list-alt"></i>
+                الطلبات المنتهية
+                <span class="float-left dont-print">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </span>
+        </div>
+        
+        <div class="card-body table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <th>#</th>
+                    <th> تاريخ ووقت الطلب</th>
+                    <th>اسم العميل</th>
+                    <th>حالة الطلب</th>
+                    <th class="text-center">التحكم</th>
+                </thead>
+                <tbody>
+                    {% for x in closed_orders %}
+                        <tr>
+                            <td>{{ x.id }}</td>
+                            <td>{{ x.date }}</td>
+                            <td>{{ x.customer }}</td>
+                            <td>{{ x.get_status_display }}</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    {% if perms.POS.view_order %}
+                                    <a href="{% url 'POS:OrderUpdate' x.id %}" class="btn btn-success"
+                                        title="عرض">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% if perms.POS.delete_order %}
+                                    <a href="" class="btn btn-danger"
+                                        title="حذف" data-toggle="modal" data-target="#action_modal">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> 
+    </div>
+    <!-- Closed Order Card End -->
+    {% endif %}
+
+    {% if perms.POS.view_cancled_order %}
+    <!-- Canceled Order Card Start -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fa fa-list-alt"></i>
+            الطلبات الملغية
+            <span class="float-left dont-print">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </span>
+        </div>
+        
+        <div class="card-body table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <th>#</th>
+                    <th> تاريخ ووقت الطلب</th>
+                    <th>اسم العميل</th>
+                    <th>حالة الطلب</th>
+                </thead>
+                <tbody>
+                    {% for x in canceled_orders %}
+                        <tr>
+                            <td>{{ x.id }}</td>
+                            <td>{{ x.date }}</td>
+                            <td>{{ x.customer }}</td>
+                            <td>{{ x.get_status_display }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> 
+    </div>
+    <!-- Canceled Order Card End -->
+    {% endif %}
+
+    <!--Open Order with Table Modal Start-->
+    <div class="modal fade bd-example-modal-lg" id="new_order_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="new_order_modalLabel">إنشاء طلب جديد</h5>
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body" id="new_order_modal_body">
+                    <div id="accordion">
+                        {% for f in floors %}
+                        <div class="card">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#floor{{ f.id }}" aria-expanded="false" aria-controls="collapseOne">
+                                <div class="card-header" id="header{{ f.id }}">
+                                    <h5 class="mb-0">
+                                        {{ f.name }}    
+                                    </h5>
+                                </div>
+                            </button>
+                      
+                          <div id="floor{{ f.id }}" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                {% for t in tables %}
+                                    {% if t.floor.id == f.id %}
+                                        {% if t.status == 1 %}
+                                            <a href="{% url 'POS:OrderCreateByTabel' object.id t.id %}" >
+                                                <i class="fas fa-life-ring m-3" style='font-size:30px;color:blue' title="{{ t.name }}"></i>
+                                            </a>
+                                        {% elif t.status == 2 %}
+                                            <a href="" onclick="return false;">
+                                                <i class="fas fa-life-ring m-3" style='font-size:30px;color:red' title="{{ t.name }}"></i>
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}     
+                    </div>
+                </div>
+                <div class="modal-footer">
+                 </div>
+            </div>
+        </div>
+    </div>
+    <!--Open Order with Table Modal End-->
+
+
+
+</div>
+
+{% endblock %}

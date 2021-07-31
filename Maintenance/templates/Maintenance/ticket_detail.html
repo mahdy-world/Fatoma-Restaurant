@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% if not object.customer_received %}
+        <div class="col-lg-12 dont-print">
+            {% if object.status == 1  and  perms.Maintenance.Diagnosis %}
+                <a class="btn btn-success btn-block" href="{% url 'Maintenance:Diagnosis' object.id %}"
+                   data-toggle="modal" data-target="#sub_modal"
+                >
+                    <i class="fa fa-screwdriver"></i>
+                    تشخيص
+                </a>
+            {% endif %}
+            {% if object.status == 2 and perms.Maintenance.maintenance_cost_rating %}
+                <a class="btn btn-success btn-block" href="{% url 'Maintenance:CostRating' object.id %}"
+                   data-toggle="modal"
+                   data-target="#sub_modal">
+                    <i class="fa fa-dollar-sign"></i>
+                    تقييم
+                </a>
+            {% endif %}
+            {% if object.status == 3 %}
+
+            <a class="btn btn-success btn-block" href="{% url 'Maintenance:CustomerReply' object.id %}"
+               data-toggle="modal"
+               data-target="#sub_modal">
+                <i class="fa fa-mobile"></i>
+الاتصال بالعميل
+            </a>
+
+            {% endif %}
+            {% if object.status == 4 or object.status == 5 or object.status == 7 or object.status == 8 %}
+                {% if perms.Maintenance.device_delivery %}
+                <a class="btn btn-success btn-block" href="{% url 'Maintenance:CustomerReceived' object.id %}"
+                   data-toggle="modal" data-target="#sub_modal">
+                    <i class="fa fa-truck"></i>
+                    تسليم العميل
+                </a>
+                {% endif %}
+            {% endif %}
+            {% if object.status == 6  and perms.Maintenance.maintenance_done %}
+
+                <a class="btn btn-success btn-block" href="{% url 'Maintenance:TicketDone' object.id %}"
+                   data-toggle="modal" data-target="#sub_modal">
+                    <i class="fa fa-check-circle"></i>
+                    تمت الصيانة
+                </a>
+
+            {% endif %}
+        </div>
+        <div class="col-lg-12 dont-print">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    {% if perms.Maintenance.ticket_Transfer %}
+                    <a href="{% url 'Maintenance:TransferTo' object.id %}" class="btn btn-block btn-warning"
+                       data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-forward"></i>
+                        تحويل
+                    </a>
+                    {% endif %}
+                </div>
+                {% if object.outsource_status == 1 and perms.Maintenance.ticket_outsource_transfer %}
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <a href="{% url 'Maintenance:OutsourceTransfer' object.id %}" class="btn btn-block btn-info"
+                           data-toggle="modal" data-target="#sub_modal">
+                            <i class="fa fa-truck"></i>
+                            تحويل إلي صيانة خارجية
+                        </a>
+                    </div>
+                {% elif object.outsource_status == 2 and perms.Maintenance.ticket_outsource_received %}
+                    <div class="col-lg-4 col-md-4 col-sm-4">
+                        <a href="{% url 'Maintenance:OutsourceReceived' object.id %}" class="btn btn-block bg-primary"
+                           data-toggle="modal" data-target="#sub_modal">
+                            <i class="fa fa-download"></i>
+                            استلام من الصيانة الخارجية
+                        </a>
+                    </div>
+                {% endif %}
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    {% if perms.Maintenance.reject_maintenance %}
+                    <a href="{% url 'Maintenance:RejectTicket' object.id %}" class="btn btn-block btn-danger"
+                       data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-times-circle"></i>
+                        لا يمكن إصلاح الجهاز
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <img src="{% url 'Barcode:single_generator' object.id %}">
+                <br>
+                تذكرة صيانة رقم: {{ object.id }}
+                <br>
+                <a href="{% url 'Maintenance:print_receipt' object.id %}" class="btn-sm btn-info" target="_blank">
+                    <i class="fa fa-receipt"></i>
+                </a>
+                <a href="{% url 'Barcode:print_barcode' %}?barcode={{ object.id }}&par1={{ object.customer.phone }}&par2={{ object.date.date.isoformat }}&quantity=1" class="btn-sm bg-primary" target="_blank">
+                    <i class="fa fa-barcode"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-user"></i>
+                        اسم العميل
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        {{ object.customer.name }}
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-mobile"></i>
+                        رقم التليفون
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <a href="tel:{{ object.customer.phone }}">
+                            {{ object.customer.phone }}
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-desktop"></i>
+                        نوع الجهاز
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        {{ object.product }}
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-barcode"></i>
+                        سيريال الجهاز
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        {{ object.sn }}
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        المشكلة
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        {{ object.problem|linebreaks }}
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-screwdriver"></i>
+                        التشخيص
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        {{ object.diagnosis|linebreaks }}
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-sticky-note"></i>
+                        ملاحظات
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        {{ object.notes|linebreaks }}
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        <i class="fa fa-dollar-sign"></i>
+                        التكلفة
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                        {{ object.cost }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                {% if perms.Maintenance.add_ticket_reply %}
+                <i class="fa fa-comments"></i> تحديثات التذكرة
+                <a href="{% url 'Maintenance:TicketReplyCreate' object.id %}" class="btn-sm btn-info"
+                   data-toggle="modal" data-target="#sub_modal">
+                    <i class="fa fa-comment-dots"></i>
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% for x in object.ticketreply_set.all %}
+                    {% if request.user == x.employee %}
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                    {% if x.employee.avatar %}
+                                        <img src="{{ x.employee.avatar.url }}" alt="{{ x.employee }}">
+                                    {% else %}
+                                        <i class="fa fa-user"></i>
+                                        <br>
+                                        {{ x.employee }}
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                    <div class="btn btn-primary btn-block">
+                                        {{ x.reply|linebreaks }}
+                                    </div>
+                                    <small>
+                                        <i class="fa fa-calendar"></i> {{ x.date.date.isoformat }}
+                                        <i class="fa fa-clock"></i> {{ x.date.time }}
+                                        {% if x.notify_customer %}
+                                            <i class="fa fa-bell"></i>
+                                            تم تنبيه العميل
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                    <div class="btn btn-info btn-block">
+                                        {{ x.reply|linebreaks }}
+                                    </div>
+                                    <small>
+                                        <i class="fa fa-calendar"></i> {{ x.date.date.isoformat }}
+                                        <i class="fa fa-clock"></i> {{ x.date.time }}
+                                        {% if x.notify_customer %}
+                                            <i class="fa fa-bell"></i>
+                                            تم تنبيه العميل
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                    {% if x.employee.avatar %}
+                                        <img src="{{ x.employee.avatar.url }}" alt="{{ x.employee }}">
+                                    {% else %}
+                                        <i class="fa fa-user"></i>
+                                        <br>
+                                        {{ x.employee }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

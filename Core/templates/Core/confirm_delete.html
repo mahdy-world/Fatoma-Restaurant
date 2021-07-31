@@ -1,0 +1,26 @@
+{% extends 'empty_base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header bg-danger">
+                رسالة تأكيد
+            </div>
+            <div class="card-body">
+                هل انت متأكد من حذف هذا العنصر؟
+                <br>
+                {{ object }}
+            </div>
+            <form class="form-horizontal" method="post" action="{{ request.path }}" enctype="multipart/form-data">
+                <div class="card-footer">
+                    {% csrf_token %}
+                    <button class="btn btn-danger" type="submit" value="DELETE">
+                        حذف
+                    </button>
+                    <a onclick="$('#sub_modal').modal('toggle');" class="btn btn-default">
+                        إلغاء
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

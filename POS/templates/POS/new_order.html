@@ -1,0 +1,933 @@
+{% extends 'base.html' %}
+{% block body %}
+
+
+    <div id="OpenOrdersalert" class="col-lg-12 col-md-12 col-sm-12 mb-1" role="alert" hidden>
+        {% if perms.POS.close_shift %}
+            <a href="{% url 'POS:CreateShiftWithOrders' shiftInfo.pos.id shiftInfo.id %}" class="btn btn-danger btn-block float-left"
+                data-toggle="modal" data-target="#sub_modal"> لا يمكن إغلاق الشيفت لوجود طلبات لم تغلق بعد , اضغط هنا لتحويل الطلبات المتبقية لشيفت آخر</a>
+        {% endif %}
+    </div>
+
+    {% if perms.POS.add_order %}
+    <!-- add new order start-->
+        <div class="col-lg-3 col-md-3 col-sm-6">
+            {% if single_order.pos.type != 1 %}
+                <a href="{% url 'POS:OrderCreate' single_order.shift.id %}" class="btn btn-success btn-block"
+                data-toggle="modal" data-target="#sub_modal">
+                    <i class="fa fa-edit"></i>
+                    إنشاء طلب جديد
+                </a>
+            {% else %}
+                <a href="" class="btn btn-success btn-block"
+                data-toggle="modal" data-target="#new_order_modal">
+                    <i class="fa fa-edit"></i>
+                إنشاء طلب جديد
+                </a>
+            {% endif %}
+        </div>
+    <!-- add new order end-->
+    {% endif %}
+
+    {% if perms.POS.view_shift %}
+    <!-- shift info start-->
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <a href="" class="btn btn-secondary btn-block"
+        data-toggle="modal" data-target="#ShiftInfo">
+        <i class="fas fa-info-circle"></i>
+            بيانات الشيفت
+        </a>
+    </div>
+    <!-- shift info end-->
+    {% endif %}
+
+    {% if perms.POS.view_open_order %}
+    <!-- open order start-->
+    <div class="col-lg-3 col-md-3 col-sm-6">
+        <a href="" class="btn btn-info btn-block"
+        data-toggle="modal" data-target="#openOrders">
+        <i class="fas fa-border-all"></i>
+            الطلبات المفتوحة
+        </a>
+    </div>
+    <!-- open order end-->
+    {% endif %}
+
+    {% if perms.POS.close_shift %}
+        <div class="col-lg-3 col-md-3 col-sm-6">
+            {% if shiftInfo.pos.shift_lock == False %}
+            <a class="btn btn-warning btn-block" onclick="EndShift('1','{{open_orders|length}}')">
+                <i class="far fa-window-close"></i>
+                إنهاء الشيفت
+            </a>
+            {% else %}
+            <a class="btn btn-danger btn-block"
+            data-toggle="modal" data-target="#shiftLockModal">
+                <i class="far fa-window-close"></i>
+                إنهاء الشيفت
+            </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+
+        <div class="container-fluid">
+            <div class="row m-3">
+            <div class="col-1 ">
+                <label> رقم الطلب : {{ single_order.id }}</label>
+            </div>
+            <div class="col-1 ">
+                <label id='customerName'> اسم العميل : {{ single_order.customer }}</label>                      
+            </div>
+            <div class="col-2">
+                <select id="customer_name" onchange="location = this.value;" >
+                    <option value="0"> اسم العميل </option>
+                    {% for c in all_customer %}
+                    <a>
+                        <option value="{% url 'POS:add_customer_to_order1' single_order.id c.id %}" 
+                        {% if c.id == single_order.customer.id %}  selected {% endif %}> {{ c.name }} </option>
+                    </a>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-2">
+                <select onchange="location = this.value;">
+                    <option value="0"> رقم العميل </option>
+                    {% for p in all_phones %}
+                        <option value="{% url 'POS:add_customer_to_order_by_phone' single_order.id p.id %}"> {{ p.phone }} </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-1">
+                {% if perms.POS.edit_order_customer %}
+                    <!-- <a href="{% url 'POS:OrderCustomerUpdate' single_order.id %}"
+                        class="btn-sm btn-warning dont-print mr-3"
+                        data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-edit"></i>
+                    </a> -->
+                    <a href="{% url 'POS:add_customer_to_order' single_order.id %}"
+                        class="btn-sm btn-success dont-print"
+                        data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-user-plus"></i>
+                    </a>
+                {% endif %}  
+            </div>
+            {% if shiftInfo.pos.type == 3 %}
+            <div class="col-3 ">
+                <label> عنوان العميل : {% if single_order.address == None %} لم يتم اختيار عنوان{% else %}{{ single_order.address }} {% endif %}</label>
+                {% if perms.POS.edit_order_address %}
+                <a href="{% url 'POS:CustomerAddressUpdate' single_order.id %}"
+                        class="btn-sm btn-warning dont-print mr-3"
+                        data-toggle="modal" data-target="#sub_modal" title="اختيار او تغيير العنوان">
+                        <i class="fa fa-edit"></i>
+                </a>
+                <a href="{% url 'POS:AddNewAddress' single_order.id  %}"
+                        class="btn-sm btn-success dont-print "
+                        data-toggle="modal" data-target="#sub_modal" title="إضافة عنوان للعميل">
+                        <i class="fa fa-plus"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% if shiftInfo.pos.type == 1 %}
+                <div class="col-2 ">
+                    <label> الدور : {% if single_order.floor == None %} لم يتم الإختيار {% else %}{{ single_order.floor }} {% endif %}</label>
+                    {% if perms.POS.edit_order_floor %}
+                    <a href="{% url 'POS:OrderFloorUpdate' single_order.id %}"
+                            class="btn-sm btn-warning dont-print mr-3"
+                            data-toggle="modal" data-target="#sub_modal">
+                            <i class="fa fa-edit"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                {% if single_order.floor != None %}
+                    <div class="col-2 ">
+                        <label> الطاولة : {% if single_order.table == None %} لم يتم الإختيار {% else %}{{ single_order.table }} {% endif %}</label>
+                        {% if perms.POS.edit_order_table %}
+                        <a href="{% url 'POS:OrderTabelUpdate' single_order.id %}"
+                                class="btn-sm btn-warning dont-print mr-3"
+                                data-toggle="modal" data-target="#sub_modal">
+                                <i class="fa fa-edit"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endif %}
+            </div>
+        </div>
+
+
+        <div class="col-lg-8 col-md-3 col-sm-6">
+            <div class="container-fluid">
+                <div id="MainCategoriesDIV" class="row ml-4 mr-1 mb-1">
+                    <button class="btn btn-dark" id="AllMainCategories" onclick="FilterSubCategory('all')">الكل</button>
+                    {% for m in MainCategories %}
+                    <button class="btn btn-dark" value="{{ m.name }}" onclick="FilterSubCategory('{{ m.name }}')">{{ m.name }}</button>
+                    {% endfor %}
+                </div>
+                <div id="SubCategoriesDIV" class="row ml-4 mr-1 mb-1" hidden>
+                    {% for m in SubCategories %}
+                    <button class="btn btn-secondary SubCategoriesButtons" value="{{ m.main_category}}" onclick="SearchSubCategoryFunction('{{ m.main_category  }}','{{m.name }}')">{{ m.name }}</button>
+                    {% endfor %}
+                </div>
+                <div class="row ml-4 mr-1 mb-1">
+                    <input id="myInput" value="" placeholder="search" onkeyup="SearchFunction()" />
+                </div>
+
+                <div class="row overflow-auto" style="height: 500px !important;">
+                    
+                    {% for x in all_products %}
+                    <div  {% if perms.POS.add_order_detail_returns %} onclick="displayModal('{{ x.id }}','1')" {% else %} onclick="displayModal('{{ x.id }}','2')" {% endif %} class="col-3 col-md-2 col-lg-2 mb-1 productDIV"  style="width: 100px; height: 210px;" id="PID_{{x.id}}">
+                        <div class="card mx-auto text-center" style="width: 100%; height: 190px;">
+                            {% if x.image %}
+                            <a><img class="card-img-top" src="{{ x.image.url }}" height='110px' width="100px" alt="{{ x.name }}"></a>
+                            {% else %}
+                            <a><img class="card-img-top" src="/static/img/product-default.png"  height='110px' width="100px" alt="{{ x.name }}"></a>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title" ><span class="fa fa-external-link mr-1">{{ x.name }}</span>
+                                    <span hidden>{{ x.sub_category.main_category }}</span>
+                                    <span hidden>{{ x.sub_category.name }}</span>
+                                    <a href="#url">{{ x.sell_price }}</a></h5>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!--MODEl-->
+
+                    <!--Add Product Modal Start-->
+                    <div class="modal fade" id="ProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="ModalLabel"></h5>
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body" id="ProductModal_body">
+                                  
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">رجوع</button>
+                                  <button id="add_pro" type="button" class="btn btn-primary">إضافة</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Add Product Modal End-->
+                    
+                    <!--Opened Orders Modal Start-->
+                    <div class="modal fade" id="openOrders" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="ModalLabel1">الطلبات المفتوحة</h5>
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                    <div class="modal-body" id="modal_body1">
+                                        <div class="card-body table-responsive">
+                                            <table class="table table-hover">
+                                            <thead>
+                                            <th>#</th>
+                                            <th> تاريخ ووقت الطلب</th>
+                                            <th>اسم العميل</th>
+                                            <th>حالة الطلب</th>
+                                            <th class="text-center">التحكم</th>
+                                            </thead>
+                                            <tbody>
+                                            {% for x in open_orders %}
+                                                <tr>
+                                                    <td>{{ x.id }}</td>
+                                                    <td>{{ x.date }}</td>
+                                                    <td>{{ x.customer }}</td>
+                                                    <td>{{ x.get_status_display }}</td>
+                                
+                                                    <td class="text-center">
+                                                        <div class="btn-group">
+                                                            <a href="{% url 'POS:OrderUpdate' x.id %}" class="btn btn-success"
+                                                            title="عرض">
+                                                                <i class="fa fa-eye"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                            </table>
+                                    </div> 
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">رجوع</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Opened Orders Modal End-->
+
+                    <!--Shift Info Modal Start-->
+                    <div class="modal fade" id="ShiftInfo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body" id="modal_body">
+                                        <div class="card" >
+                                            <div class="card-header">
+                                                <i class="fa fa-list"></i>
+                                                بيانات الشيفت
+                                            </div>
+                                            <table class="table table-responsive shiftInfo">
+                                                <tr>
+                                                    <td>
+                                                         التاريخ
+                                                    </td>
+                                                    <td>
+                                                        {{ shiftInfo.date }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        بداية الشيفت
+                                                    </td>
+                                                    <td>
+                                                        {{ shiftInfo.start_time }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        نهاية الشيفت
+                                                    </td>
+                                                    <td>
+                                                        {{ shiftInfo.end_time }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        الموظف
+                                                    </td>
+                                                    <td>
+                                                        {{ shiftInfo.employee }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        رقم الكاشير
+                                                    </td>
+                                                    <td>
+                                                        {{ shiftInfo.cashier_no }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        حالة الشيفت
+                                                    </td>
+                                                    <td>
+                                                        {{ shiftInfo.get_status_display }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        تابع لنقطة بيع
+                                                    </td>
+                                                    <td>
+                                                        {{ shiftInfo.pos }}
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>    
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">رجوع</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Shift Info Modal End-->
+
+                    <!--Shift Lock Modal Start-->
+                    <div class="modal fade" id="shiftLockModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="shiftLockLabel">تأكيد إغلاق الشيفت</h5>
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body" id="shiftLockModal_body">
+                                    <input placeholder="ادخل كلمة السر الخاصة بنقطة البيع" type="password" id="shiftLockPassword">
+                                    <div id="shiftLockPasswordalert" class="alert alert-danger" role="alert" hidden>
+                                        كلمة السر غير صحيحة
+                                    </div>
+                                </div>
+                                
+                                <div class="modal-footer">
+                                        <button id="shiftLockbutton" type="button" class="btn btn-primary" onclick="EndShift('{{shiftInfo.pos.password}}','{{open_orders|length}}')">إغلاق الشيفت</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <!--Shift Lock Modal End-->
+
+                    <!--Open Order with Table Modal Start-->
+                    <div class="modal fade bd-example-modal-lg" id="new_order_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog  modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="new_order_modalLabel">إنشاء طلب جديد</h5>
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body" id="new_order_modal_body">
+                                    <div id="accordion">
+                                        {% for f in floors %}
+                                        <div class="card">
+                                            <button class="btn btn-link" data-toggle="collapse" data-target="#floor{{ f.id }}" aria-expanded="false" aria-controls="collapseOne">
+                                                <div class="card-header" id="header{{ f.id }}">
+                                                    <h5 class="mb-0">
+                                                        {{ f.name }}    
+                                                    </h5>
+                                                </div>
+                                            </button>
+                                      
+                                          <div id="floor{{ f.id }}" class="collapse" data-parent="#accordion">
+                                            <div class="card-body">
+                                                {% for t in tables %}
+                                                    {% if t.floor.id == f.id %}
+                                                        {% if t.status == 1 %}
+                                                            <a href="{% url 'POS:OrderCreateByTabel' single_order.shift.id t.id %}" >
+                                                                <i class="fas fa-life-ring m-3" style='font-size:30px;color:blue' title="{{ t.name }}"></i>
+                                                            </a>
+                                                        {% elif t.status == 2 %}
+                                                            <a href="" onclick="return false;">
+                                                                <i class="fas fa-life-ring m-3" style='font-size:30px;color:red' title="{{ t.name }}"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                          </div>
+                                        </div>
+                                        {% endfor %}     
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Open Order with Table Modal End-->
+
+                    <!-- PreCheckoutModal Start -->
+                        <div class="modal fade" id="PreCheckoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="PreCheckoutModalLabel">إستكمال بيانات الطلب</h5>
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body" id="PreCheckoutModal_body">
+                                        <label>تابع لشريـك : </label>
+                                        <select id="partner">
+                                            <option value="">اضغط للإختيار</option>
+                                            {% for p in partners %}
+                                            <option value="{{ p.id }}">{{ p.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label>المبلغ المدفوع</label>
+                                        <input  type="text" id="paidValue">
+                                        <label>طريقة الدفع</label>
+                                        <select id="paidMethod">
+                                            <option value="1">كاش</option>
+                                            <option value="2">فيزا</option>
+                                        </select>
+                                        <div id="PreCheckoualert" class="alert alert-danger" role="alert" hidden>
+                                                لا يمكن إكمال الطلب - المبلغ المدفوع اقل من المبلغ المستحق
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button id="PreCheckoutModalbutton" type="button" class="btn btn-primary" onclick="CheckOut()">تأكيد</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- PreCheckoutModal End -->
+                        
+                    <!--MODEl-->
+
+                </div>
+            </div>
+
+        </div>
+<div class="col-lg-4 col-md-3 col-sm-6" >
+            <h3>تأكيد الطلب</h3>
+            <div class="row overflow-auto" style="height: 430px !important;">
+                <table class="table" id="TemporaryOrder">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">الصنف</th>
+                        <th scope="col">الكمية</th>
+                        <th scope="col">سعر الوحدة</th>
+                        <th scope="col">الضريبة</th>
+                        <th scope="col">الإجمالي</th>
+                        <th scope="col">إزالة</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <table class="table">
+                    {% if perms.POS.add_order_discount %}
+                    <tr>
+                        <div class="btn-group" style="width: 100%;" >
+                            <!-- <input class="text-center form-control-lg mb-2" id="code"> -->
+                            <input id="code" class="text-center form-control-lg mb-2" placeholder="قيمة الخصم" />
+                            <i class="fas fa-keyboard fa-3x" aria-hidden="true" onclick="openKeyboard()" style="position: absolute; top:0; left:0;"></i>
+                        </div>
+                        <div id="keyboard" style="display:none;" class="btn-group-vertical mt-4" role="group" aria-label="Basic example" style="width: 100%;">
+                            
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '1';">1</button>
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '2';">2</button>
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '3';">3</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '4';">4</button>
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '5';">5</button>
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '6';">6</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '7';">7</button>
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '8';">8</button>
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '9';">9</button>
+                            </div>
+                            <div class="btn-group py-1">
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value.slice(0, -1);">&lt;</button>
+                                <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '0';">0</button>
+                            </div>
+                            <div class="btn-group m-1">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="percantageType2" name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="percantageType2">قيمة ثابتة</label>
+                                  </div>
+                                  <div class="custom-control custom-radio">
+                                    <input type="radio" id="percantageType1" name="customRadio" class="custom-control-input">
+                                    <label class="custom-control-label" for="percantageType1">نسبة</label>
+                                </div>
+                                <div class="mr-5 ml-1" style="width: 70%;">
+                                    <button style="width: 100%;" type="submit" class="btn btn-info " onClick="AddDiscount()">إضافة خصم</button>
+                                </div>
+                            </div>
+                        </div>
+                    </tr>
+                    {% endif %}
+                    {% if single_order.pos.type != 3 %}
+                    <tr>
+                        <th scope="col">خدمة الصالة</th>
+                        <th scope="col"> <input  id="SCost" name="SCost" value="" disabled /></th>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="col">الضرائب</th>
+                        <th scope="col"> <input id="TotalTax" name="TotalTax" value="" disabled/></th>
+                    </tr>
+                    {% if single_order.pos.type == 3 %}
+                    <tr>
+                        <th scope="col">التوصيل</th>
+                        <th scope="col"> <input id="deliveryCost" name="deliveryCost" value="" disabled/></th>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="col">المبلغ الكلي</th>
+                        <th scope="col"> <input id="FinalPrice" name="FinalPrice" value=""  disabled/> </th>
+                    </tr>
+                </table>
+
+                {% if perms.POS.assign_order_to_delivery and single_order.pos.type == 3 %}
+                <a href="{% url 'POS:AddOrderDeliveryEmployee' single_order.id %}"
+                    class="dont-print" data-toggle="modal" data-target="#sub_modal">
+                    <button type="submit" class="btn btn-warning mb-1" style="width: 100%;">تسليم الطلب لمندوب</button>
+                </a>
+                    {% if perms.POS.close_order and single_order.delivery_employees != None  %}
+                    <button type="submit" class="btn btn-success" style="width: 100%;" onClick="PreCheckout()">تأكيد الطلب</button>
+                    {% endif %}
+                {% else %}
+                    <button type="submit" class="btn btn-success" style="width: 100%;" onClick="PreCheckout()">تأكيد الطلب</button>
+                {% endif %}
+            </div>
+</div>
+
+
+
+
+{% endblock %}
+
+
+
+{% block js %}
+
+<script>
+
+
+    function FilterSubCategory(name){
+        var SubCategoriesButtons = document.getElementsByClassName("SubCategoriesButtons");
+        for (var i = 0; i < SubCategoriesButtons.length; i++) {
+            if(name == 'all'){
+                SearchMainCategoryFunction('');
+                document.getElementById("SubCategoriesDIV").setAttribute("hidden","");
+            }else{
+                SearchMainCategoryFunction(name);
+                document.getElementById("SubCategoriesDIV").removeAttribute("hidden");
+                if( SubCategoriesButtons.item(i).value != name){
+                    SubCategoriesButtons.item(i).setAttribute("hidden","");
+                }else{
+                    SubCategoriesButtons.item(i).removeAttribute("hidden");
+                }
+            }
+        }        
+    }
+
+    function SearchFunction(){
+        var input, filter, p_name;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+
+        var x = document.getElementsByClassName("productDIV");
+        var i;
+        for (i = 0; i < x.length; i++) {
+            p_name = x[i].getElementsByTagName('div')[1].getElementsByTagName('h5')[0].getElementsByTagName('span')[0].innerHTML
+            if(p_name.toUpperCase().indexOf(filter)  > -1 ){
+                x[i].style.display = "";
+            }else{
+                x[i].style.display = "none";
+            }
+        }  
+    }
+
+    function SearchMainCategoryFunction(input){
+        var filter, p_name;
+        filter = input.toUpperCase();
+
+        var x = document.getElementsByClassName("productDIV");
+        var i;
+        for (i = 0; i < x.length; i++) {
+            p_name = x[i].getElementsByTagName('div')[1].getElementsByTagName('h5')[0].getElementsByTagName('span')[1].innerHTML
+            if(p_name.toUpperCase().indexOf(filter)  > -1 ){
+                x[i].style.display = "";
+            }else{
+                x[i].style.display = "none";
+            }
+        }  
+    }
+
+    function SearchSubCategoryFunction(mainCategory , subCategory){
+        var filter, p_name;
+        filter1 = mainCategory.toUpperCase();
+        filter2 = subCategory.toUpperCase();
+
+        var x = document.getElementsByClassName("productDIV");
+        var i;
+        for (i = 0; i < x.length; i++) {
+            p_mainCategory = x[i].getElementsByTagName('div')[1].getElementsByTagName('h5')[0].getElementsByTagName('span')[1].innerHTML
+            p_subCategory = x[i].getElementsByTagName('div')[1].getElementsByTagName('h5')[0].getElementsByTagName('span')[2].innerHTML
+            if((p_mainCategory.toUpperCase().indexOf(filter1)  > -1 ) && (p_subCategory.toUpperCase().indexOf(filter2)  > -1) ){
+                x[i].style.display = "";
+            }else{
+                x[i].style.display = "none";
+            }
+        } 
+    }
+
+    function OrderDataDetail(){
+
+        const TemporaryOrderTable = document.getElementById('TemporaryOrder')
+        const ProductModal = document.getElementById('modal-body')
+
+        total_tax = 0 
+        final_price = 0 
+        
+        $.ajax({
+        url: '/POS/Orderdetail/{{ single_order.id }}'  ,
+        success: function (res)
+        {
+            if (res.orders.length > 0 ){
+                $('#TemporaryOrder tbody').empty();
+            }
+            
+            for ( var key in res.orders ){
+
+                total_tax = total_tax + res.orders[key].taxes
+                final_price = final_price + res.orders[key].sub_total
+                r = (res.orders[key].price*res.orders[key].quantity)
+                id = parseInt(res.orders[key].id)
+                
+                TemporaryOrderTable.innerHTML +=
+                `
+                    <tr>
+                        <td>${(parseInt(key) + 1)}</td>
+                        <td class="productID" >${res.products_names[key]}</td>
+                        <td><input type="number" name="quantity" value="${res.orders[key].quantity}" style="width:35px;" id="q_${res.orders[key].id}" onchange="product_q('${res.orders[key].id}')"></td>
+                        <td>${res.orders[key].price}</td>
+                        <td>${res.orders[key].taxes}</td>
+                        <td>${res.orders[key].sub_total}</td>
+                        <td>
+                            <a href="/POS/Delete_order_detail/${id}" class="${res.orders[key].id}">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </td>
+                    </tr>
+                `
+            }
+            document.getElementById("SCost").value = res.o_list[4]
+            console.log( document.getElementById("SCost").value)    
+            document.getElementById("code").value = res.o_list[2]    
+            document.getElementById("TotalTax").value = res.o_list[0]
+            document.getElementById("FinalPrice").value = res.o_list[1] 
+            document.getElementById("deliveryCost").value = res.o_list[3]
+
+            
+
+            Orderdata = {
+                'orderId': '{{ single_order.id }}',
+                'total_tax': total_tax,
+                'final_price':final_price
+            }
+            $.ajax({
+                url: '/POS/OrderTotalPrice/'  ,
+                data: Orderdata,
+                success: function (res)
+                {}
+            })
+
+        }
+        });
+
+    }
+
+    function displayModal(p_id, Return) {
+        
+        $.ajax({
+            url: '/POS/SingleProduct/' + p_id,
+            success: function (res)
+            {
+                console.log(res.single_product)
+                for ( var key in res.single_product ){
+                    document.getElementById('ModalLabel').innerText= res.single_product[key].name
+                    if(res.perm){
+                        ProductModal_body.innerHTML =
+                        `
+                            <h5> السعر: ${ res.single_product[key].sell_price} </h5>
+                            <label> الكمية: </label> 
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary" onclick="increaseValue()">+</button>
+                                <input id="quantity" type="text" class="btn btn-secondary" value="1" disabled></input>
+                                <button type="button" class="btn btn-secondary" onclick="decreaseValue()">-</button>
+                            </div>
+                        `
+                    }
+                    else{
+                        ProductModal_body.innerHTML =
+                        `
+                            <h5> السعر: ${ res.single_product[key].sell_price} </h5>
+                            <label> الكمية: </label> 
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                <button type="button" class="btn btn-secondary" onclick="increaseValue()">+</button>
+                                <input id="quantity" type="text" class="btn btn-secondary" value="1" disabled></input>
+                                <button type="button" class="btn btn-secondary" onclick="decreaseValue1()">-</button>
+                            </div>
+                        `
+                    }
+                }
+                add = document.getElementById('add_pro')
+                add.setAttribute('onclick', `addFun('${res.single_product[key].id}')`);
+            }
+        });
+        $('#ProductModal').modal('show')
+        
+    }
+
+    function addFun(product_id){
+        q = document.getElementById('quantity').value
+        $('#ProductModal').modal('hide')
+
+        $.ajax({
+            url: '/POS/AddProduct/{{ single_order.id }}/' + product_id + '/' + q ,
+            success: function (res){
+                OrderDataDetail()
+            }
+        })
+
+
+    }
+
+    function EndShift(x, openOrderCount){
+        console.log(openOrderCount)
+        if(openOrderCount > 0 ){
+            console.log('1')
+            $('#shiftLockModal').modal('hide');
+            document.getElementById("OpenOrdersalert").removeAttribute("hidden");
+        }else{
+            console.log('2')
+            if(x == 1 ){
+                $.ajax({
+                url: '/POS/EndShift/' + '{{shiftInfo.id}}'  ,
+                success: function (res)
+                {
+                    window.location.href =  `/POS/shift/Report/{{ single_order.shift.id }}`;
+                }
+                });
+                }else{
+                    password = document.getElementById("shiftLockPassword").value
+                    if(password == x){
+                        $.ajax({
+                        url: '/POS/EndShift/' + '{{shiftInfo.id}}'  ,
+                        success: function (res)
+                        {
+                            window.location.href =  `/POS/shift/Report/{{ single_order.shift.id }}`;
+                        }
+                        });
+                    }else{
+                        document.getElementById("shiftLockPasswordalert").removeAttribute("hidden");
+                        
+                    }
+                }
+        }
+        
+    }
+
+    function AddDiscount(){
+        Orderdata = {
+            'orderId': '{{ single_order.id }}',
+            'percantageType': 0,
+            'discountValue':0 
+        }
+
+        price = document.getElementById("FinalPrice").value
+        if(document.getElementById("percantageType1").checked){
+            d = (document.getElementById("code").value  * price / 100.0)
+            Orderdata['percantageType'] = 1
+        }
+        else if(document.getElementById("percantageType2").checked){
+            d = document.getElementById("code").value
+            Orderdata['percantageType'] = 2
+        }
+        else{
+            d=0
+        }
+
+        Orderdata['discountValue'] = d
+
+        $.ajax({
+            url: '/POS/addDiscount/'  ,
+            data: Orderdata,
+            success: function (res)
+            { 
+                OrderDataDetail()
+            }
+        })
+
+    }
+
+    function PreCheckout(){
+        $('#PreCheckoutModal').modal('show')
+    }
+
+    function CheckOut(){
+            total_tax = document.getElementById("TotalTax").value
+            final_price = document.getElementById("FinalPrice").value
+            paid = document.getElementById("paidValue").value
+            method = document.getElementById("paidMethod").value
+            partner_id = document.getElementById("partner").value
+            console.log(document.getElementById("partner").value)
+        if( final_price <= paid ){
+            
+            Orderdata = {
+                'orderId': '{{ single_order.id }}',
+                'total_tax': total_tax,
+                'final_price':final_price,
+                'paid': paid,
+                'method': method,
+                'partner_id':partner_id
+            }
+            $.ajax({
+                url: '/POS/CheckOut/'  ,
+                data: Orderdata,
+                success: function (res)
+                { 
+                    console.log(window.location.href =  `/POS/pos/`)
+                    window.location.href =  `/POS/OrderUpdate/{{ single_order.id }}`;
+                }
+            })
+        }else{
+            document.getElementById("PreCheckoualert").removeAttribute("hidden");
+        }
+    }
+
+    function openKeyboard(){
+        keyboard_div = document.getElementById("keyboard")
+        if(keyboard_div.style.display == 'block'){
+            keyboard_div.style.display = 'none';
+        }else{
+            keyboard_div.style.display = 'block';
+        }
+    }
+    
+    function product_q(p_id){
+        p_value = `q_`+ p_id
+        Orderdata = {
+            'product_id': p_id,
+            'new_value': document.getElementById(p_value).value   
+        }
+        $.ajax({
+            url: '/POS/ChangeOrderDetailQuantity/' ,
+            data: Orderdata,
+            success: function (res)
+            {
+                OrderDataDetail()
+            }
+        })
+    }
+
+    function increaseValue() {
+        var value = parseInt(document.getElementById('quantity').value, 10);
+        value = isNaN(value) ? 0 : value;
+        value++;
+        document.getElementById('quantity').value = value;
+    }
+
+    function decreaseValue() {
+        var value = parseInt(document.getElementById('quantity').value, 10);
+        value = isNaN(value) ? 0 : value;
+        value--;
+        document.getElementById('quantity').value = value;
+    }
+
+    function decreaseValue1(){
+        var value = parseInt(document.getElementById('quantity').value, 10);
+        value = isNaN(value) ? 0 : value;
+        value < 1 ? value = 1 : '';
+        value--;
+        document.getElementById('quantity').value = value;
+    }
+
+    $(document).ready(function(){
+        OrderDataDetail()
+    });
+
+    // $('#customer_name').on('change', function (x) {
+    //     console.log(this.value)
+    //     if(this.value != 0 ){
+    //         console.log('lets do some thing')
+    //     }
+    // });
+
+</script>
+{% endblock %}

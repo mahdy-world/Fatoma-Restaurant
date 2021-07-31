@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block body %}
+
+
+<div class="col-lg-12 mt-3">
+    <!-- POS Card Start -->
+    <div class="card">
+        <div class="card-header">
+            <h1>
+                {{ object.title }}
+            </h1>
+        </div>
+        <div class="card-body">
+            {{ object.content|safe }}
+        </div>
+    </div>
+    <!-- POS Card End -->
+</div>
+
+{% endblock %}

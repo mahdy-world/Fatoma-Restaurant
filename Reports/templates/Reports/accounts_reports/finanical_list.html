@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        <h5>تقارير القائمة المالية</h5>
+    </div>
+    <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <tr>
+                    <td>فيمة المخزون</td>
+                    <td>{{ stock_value }}</td>
+                </tr>
+                <tr>
+                    <td>رصيد الخزائن</td>
+                    <td>{{ treasuries_money }}</td>
+                </tr>
+                <tr>
+                    <td>الدائن(ديون للشركة)</td>
+                    <td>{{ creditors }}</td>
+                </tr>
+                <tr>
+                    <td>المدين(ديون علي الشركة)</td>
+                    <td>{{ debitors }}</td>
+                </tr>
+                <tr>
+                    <td>رأس المال</td>
+                    <td>{{ capital }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}

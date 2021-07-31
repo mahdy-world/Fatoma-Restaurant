@@ -1,0 +1,111 @@
+<html>
+<meta charset="UTF-8">
+<title>ONERP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% load static %}
+<link rel="stylesheet" href="{% static 'plugins/select2/css/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/fontawesome/css/all.css' %}">
+<link rel="stylesheet" href="{% static 'css/ONERP.css' %}">
+<style>
+    @media print {
+
+        @page {
+            size: 3.8cm 2.5cm;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .barcode {
+            width: {{ setting.width|stringformat:'f' }}cm;
+            height: {{ setting.height|stringformat:'f' }}cm;
+            max-width: {{ setting.width|stringformat:'f' }}cm;
+            max-height: {{ setting.height|stringformat:'f' }}cm;
+            font-size: {{ setting.font_size|stringformat:'f' }}px;
+        }
+    }
+
+    .barcode {
+        width: {{ setting.width|stringformat:'f' }}cm;
+        height: {{ setting.height|stringformat:'f' }}cm;
+        min-width: {{ setting.width|stringformat:'f' }}cm;
+        min-height: {{ setting.height|stringformat:'f' }}cm;
+        max-width: {{ setting.width|stringformat:'f' }}cm;
+        max-height: {{ setting.height|stringformat:'f' }}cm;
+        font-size: {{ setting.font_size|stringformat:'f' }}px;
+    }
+
+    table, td {
+        border: 1px solid black;
+    }
+</style>
+<body>
+
+<div class="col-lg-12">
+    <div class="card dont-print">
+        <div class="card-header">
+            طباعة ملصقات لـ {{ invoice }}
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                <td>#</td>
+                <td>المنتج</td>
+                <td>الكمية</td>
+                <td>السعر</td>
+                </thead>
+                <tbody>
+                {% for x in invoice.invoiceitem_set.all %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ x.item }}</td>
+                        <td>{{ x.quantity|floatformat }}</td>
+                        <td>{{ x.item.sell_price|floatformat }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% load my_filters %}
+{% for x in invoice.invoiceitem_set.all %}
+    {% for count in x.quantity|times %}
+        <div class="col-lg-3 col-md-3 col-sm-12 col-sm-12">
+            <div class="barcode">
+                <div class="row">
+                    {% if setting.print_company_name %}
+                        <div class="col-lg-12 center-text">
+                            {{ setting.company_name }}
+                        </div>
+                    {% endif %}
+                    <div class="col-lg-12">
+                        <img src="{% url 'Barcode:single_generator' x.item.id %}"
+                             style="max-width: {{ setting.width|stringformat:'f' }}cm;">
+                    </div>
+                    {% if setting.print_product_name %}
+                        {% if x.item %}
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 center-text">
+                                {{ x.item }}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    {% if setting.print_price %}
+                        {% if x.item.sell_price %}
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 center-text">
+                                {{ x.item.sell_price }}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endfor %}
+<script>
+    window.print();
+</script>
+</body>
+</html>

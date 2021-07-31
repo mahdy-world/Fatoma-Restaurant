@@ -1,0 +1,814 @@
+{% extends 'base.html' %}
+{% block body %}
+    <!-- Normal Invoices -->
+    {% if invoice.invoice_type == 1 or invoice.invoice_type == 4 or invoice.invoice_type == 5 or invoice.invoice_type == 6 or invoice.invoice_type == 7 or invoice.invoice_type == 15 or invoice.invoice_type == 16 or invoice.invoice_type == 17 or invoice.invoice_type == 23 %}
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header p-0 border-bottom-0">
+                    <div class="card-tools">
+                        {% if prev_invoice %}
+                            <a type="button" class="btn btn-tool"
+                               href="{% url 'Invoices:show_invoice' prev_invoice.id %}">
+                                <i class="fa fa-angle-double-right"></i>
+                                السابق
+                            </a>
+                        {% else %}
+                            <a type="button" class="btn btn-tool" href="" disabled="true">
+                                <i class="fa fa-angle-double-right"></i>
+                                السابق
+                            </a>
+                        {% endif %}
+                        {% if next_invoice %}
+                            <a type="button" class="btn btn-tool"
+                               href="{% url 'Invoices:show_invoice' next_invoice.id %}">
+                                التالي
+                                <i class="fa fa-angle-double-left"></i>
+                            </a>
+                        {% else %}
+                            <a type="button" class="btn btn-tool" href="" disabled="true">
+                                التالي
+                                <i class="fa fa-angle-double-left"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <ul class="nav nav-tabs" role="tablist">
+                        {% for x in opened_invoices %}
+                            <li class="nav-item">
+                                <a href="{% url 'Invoices:show_invoice' x.id %}"
+                                   class="nav-link btn btn-{% if x.id == invoice.id %}primary{% else %}info{% endif %}">
+                                    {{ x.id }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        {% if invoice.invoice_type == 1 or invoice.invoice_type == 4 or invoice.invoice_type == 5 or invoice.invoice_type == 6 or invoice.invoice_type == 7 or invoice.invoice_type == 15 or invoice.invoice_type == 16 or invoice.invoice_type == 17 %}
+                            <li class="nav-item">
+                                <a href="{% url 'Invoices:make_invoice' invoice.invoice_type %}"
+                                   class="nav-link btn btn-success">
+                                    <i class="fa fa-plus-circle"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <a href="#"
+                               class="btn btn-block {% if invoice.saved %}btn-success{% else %}btn-warning{% endif %}{% if invoice.deleted %} btn-danger{% endif %}">
+                                {{ invoice }}
+                            </a>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <td>التاريخ</td>
+                                        <td>
+                                            {{ invoice.date.astimezone.date.isoformat }}
+                                        </td>
+                                        <td>
+                                            {% if invoice.edit_invoice_date %}
+                                                <a href="{% url 'Invoices:edit_invoice_date' invoice.id %}"
+                                                   class="btn-sm btn-warning dont-print"
+                                                   data-toggle="modal" data-target="#sub_modal">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            {% if not invoice.invoice_type == 17 %}
+                                                {% if invoice.invoice_type == 1 or invoice.invoice_type == 2 or invoice.invoice_type == 3 or invoice.invoice_type == 4 or invoice.invoice_type == 7 %}
+                                                    العميل
+                                                {% elif invoice.invoice_type == 5 or invoice.invoice_type == 6 %}
+                                                    المورد
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if not invoice.invoice_type == 17 %}
+                                                {% if invoice.customer %}{{ invoice.customer }}{% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if invoice.invoice_can_edit %}
+                                                        <a href="{% url 'Invoices:edit_invoice_customer' invoice.id %}"
+                                                           class="btn-sm btn-warning dont-print"
+                                                           data-toggle="modal" data-target="#sub_modal">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if invoice.invoice_can_edit %}
+                                                        <a href="{% url 'Invoices:add_customer_to_invoice' invoice.id %}"
+                                                           class="btn-sm btn-success dont-print"
+                                                           data-toggle="modal" data-target="#sub_modal">
+                                                            <i class="fa fa-user-plus"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <tr>
+                                        {% if invoice.invoice_type in in_stock_invoices %}
+                                            <td>
+                                                إلي فرع
+                                            </td>
+                                            <td>
+                                                {% if invoice.to_branch %}{{ invoice.to_branch }}{% endif %}
+                                            </td>
+                                            <td>
+                                                {% if invoice.invoice_can_edit %}
+                                                    <a href="{% url 'Invoices:edit_invoice_branch' invoice.id %}"
+                                                       class="btn-sm btn-warning dont-print"
+                                                       data-toggle="modal" data-target="#sub_modal">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        {% elif invoice.invoice_type in out_stock_invoices or invoice.invoice_type == 17 %}
+                                            <td>
+                                                من فرع
+                                            </td>
+                                            <td>
+                                                {% if invoice.from_branch %}{{ invoice.from_branch }}{% endif %}
+                                            </td>
+                                            <td>
+                                                {% if invoice.invoice_can_edit %}
+                                                    <a href="{% url 'Invoices:edit_invoice_branch' invoice.id %}"
+                                                       class="btn-sm btn-warning dont-print"
+                                                       data-toggle="modal" data-target="#sub_modal">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                    <tr>
+                                        {% if invoice.invoice_type in in_treasury_invoices %}
+                                            <td>
+                                                إلي خزينة
+                                            </td>
+                                            <td>
+                                                {% if invoice.from_treasury %}{{ invoice.from_treasury }}{% endif %}
+                                                {% if invoice.to_treasury %}{{ invoice.to_treasury }}{% endif %}
+                                            </td>
+                                            <td>
+                                                {% if invoice.invoice_can_edit %}
+                                                    <a href="{% url 'Invoices:edit_invoice_treasury' invoice.id %}"
+                                                       class="btn-sm btn-warning dont-print"
+                                                       data-toggle="modal" data-target="#sub_modal">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        {% elif invoice.invoice_type in out_treasury_invoices %}
+                                            <td>
+                                                من خزينة
+                                            </td>
+                                            <td>
+                                                {% if invoice.from_treasury %}{{ invoice.from_treasury }}{% endif %}
+                                            </td>
+                                            <td>
+                                                {% if invoice.invoice_can_edit %}
+                                                    <a href="{% url 'Invoices:edit_invoice_treasury' invoice.id %}"
+                                                       class="btn-sm btn-warning dont-print"
+                                                       data-toggle="modal" data-target="#sub_modal">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        {% elif invoice.invoice_type == 17 %}
+                                            <td>
+                                                إلي فرع
+                                            </td>
+                                            <td>
+                                                {% if invoice.to_branch %}{{ invoice.to_branch }}{% endif %}
+                                            </td>
+                                            <td>
+                                                {% if invoice.invoice_can_edit %}
+                                                    <a href="{% url 'Invoices:edit_invoice_branch' invoice.id %}"
+                                                       class="btn-sm btn-warning dont-print"
+                                                       data-toggle="modal" data-target="#sub_modal">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+
+                                        {% endif %}
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-12{% if invoice.invoice_can_edit %} dont-print{% endif %}">
+                            <form class="form-horizontal" method="post" action="#">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                        <td>#</td>
+                                        <td>
+                                            المنتج
+                                            {% if invoice.invoice_can_edit %}
+                                                <a href="{% url 'Products:ProductCreate' %}" data-toggle="modal"
+                                                   data-target="#sub_modal"
+                                                   class="btn-sm btn-success">
+                                                    <i class="fa fa-plus-circle"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>الكمية</td>
+                                        <td>السعر</td>
+                                        <td>إجمالي السعر</td>
+                                        <td>خصم</td>
+                                        <td>بعد الخصم</td>
+                                        <td>ملاحظات</td>
+                                        <td></td>
+                                        </thead>
+                                        <tbody>
+                                        {% for item in invoice.invoiceitem_set.all %}
+                                            <tr>
+                                                <td>
+                                                    {{ forloop.counter }}
+                                                </td>
+                                                <td>
+                                                    {{ item.item }}
+                                                </td>
+                                                <td>
+                                                    {{ item.quantity|floatformat }}
+                                                    {% if invoice.invoice_can_edit %}
+                                                        <a href="{% url 'Invoices:edit_invoice_item_quantity' item.id %}"
+                                                           class="btn-sm btn-warning dont-print"
+                                                           data-toggle="modal" data-target="#sub_modal">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {{ item.unit_price|floatformat }}
+                                                    {% if perms.Invoices.edit_item_unit_price %}
+                                                        {% if invoice.invoice_can_edit %}
+                                                            <a href="{% url 'Invoices:edit_invoice_item_price' item.id %}"
+                                                               class="btn-sm btn-warning dont-print"
+                                                               data-toggle="modal" data-target="#sub_modal">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {{ item.total_price|floatformat }}
+                                                </td>
+                                                <td>
+                                                    {{ item.discount|floatformat }}
+                                                    {% if perms.Invoices.item_discount %}
+                                                        {% if invoice.invoice_can_edit %}
+                                                            <a href="{% url 'Invoices:edit_invoice_item_discount' item.id %}"
+                                                               class="btn-sm btn-warning dont-print"
+                                                               data-toggle="modal" data-target="#sub_modal">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {{ item.after_discount|floatformat }}
+                                                </td>
+                                                <td>
+                                                    {{ item.comment }}
+                                                    {% if invoice.invoice_type == 1 %}
+                                                        {% if perms.Invoices.show_profit %}
+                                                            <br>
+                                                            {% if item.purchase_profit > 0 %}
+                                                                <div class="badge badge-success">
+                                                            {% elif item.purchase_profit < 0 %}
+                                                                <div class="badge badge-danger">
+                                                            {% else %}
+                                                                <div class="badge badge-warning">
+                                                            {% endif %}
+
+                                                        الربح/شراء
+                                                        {{ item.purchase_profit }}
+                                                        </div>
+                                                            <br>
+                                                            {% if item.cost_profit > 0 %}
+                                                                <div class="badge badge-success">
+                                                            {% elif item.cost_profit < 0 %}
+                                                                <div class="badge badge-danger">
+                                                            {% else %}
+                                                                <div class="badge badge-warning">
+                                                            {% endif %}
+                                                        الربح/التكلفة
+                                                        {{ item.cost_profit }}
+                                                        </div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if invoice.invoice_can_edit %}
+                                                        <a href="{% url 'Invoices:delete_invoice_item' item.id %}"
+                                                           class="btn-sm btn-danger">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td></td>
+                                            <td>إجمالي</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>{{ invoice.total|floatformat }}</td>
+                                            <td>
+                                                {{ invoice.discount|floatformat }}
+                                                {% if invoice.invoice_can_edit %}
+                                                    {% if perms.Invoices.invoice_discount %}
+                                                        <a href="{% url 'Invoices:edit_invoice_discount' invoice.id %}"
+                                                           class="btn-sm btn-warning dont-print"
+                                                           data-target="#sub_modal" data-toggle="modal">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ invoice.after_discount|floatformat }}</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+
+                                        {% if invoice.invoice_can_edit %}
+                                            <tr>
+                                                <td>
+                                                    {% csrf_token %}
+                                                    <input class="form-control" name="barcode" id="barcode">
+                                                </td>
+                                                <td>
+                                                    {{ form.item }}
+                                                    <div id="search_results">
+
+                                                    </div>
+                                                </td>
+                                                <td>{{ form.quantity }}</td>
+                                                <td>{{ form.unit_price }}</td>
+                                                <td>{{ form.total_price }}</td>
+                                                <td>{{ form.discount }}</td>
+                                                <td>{{ form.after_discount }}</td>
+                                                <td>{{ form.comment }}</td>
+                                                <td>
+                                                    <button class="btn-sm btn-success" type="submit">
+                                                        <i class="fa fa-plus-circle"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-12">
+                            <div id="invoice_product_image">
+
+                            </div>
+                        </div>
+                        {% if not invoice.deleted %}
+                            {% if not invoice.saved %}
+                                <div class="col-lg-6">
+                                    <a href="{% url 'Invoices:save_invoice' invoice.id %}"
+                                       class="btn btn-block btn-success"
+                                       data-toggle="modal"
+                                       data-target="#sub_modal">
+                                        <i class="fa fa-save"></i>
+                                    </a>
+                                </div>
+                                <div class="col-lg-6">
+                                    {% if perms.Invoices.delete_invoice %}
+                                        <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                                           class="btn btn-block btn-danger"
+                                           data-toggle="modal"
+                                           data-target="#sub_modal">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="col-lg-6 dont-print">
+                                    <a href="{% url 'Invoices:print_invoice' invoice.id %}"
+                                       class="btn btn-block btn-success dont-print"
+                                       target="_blank">
+                                        <i class="fa fa-print"></i>
+                                    </a>
+                                </div>
+                                {% if perms.Invoices.undo_save_ionvoices %}
+                                    <div class="col-lg-6 dont-print">
+                                        <a href="{% url 'Invoices:unsave_invoice' invoice.id %}"
+                                           class="btn btn-block btn-warning dont-print"
+                                           data-toggle="modal"
+                                           data-target="#sub_modal">
+                                            <i class="fa fa-undo"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if invoice.invoice_type == 5 %}
+                                    <div class="col-lg-12 dont-print">
+                                        <a href="{% url 'Barcode:print_barcode_for_invoice' invoice.id %}"
+                                           class="btn btn-block btn-primary dont dont-print" target="_blank">
+                                            <i class="fa fa-barcode"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {% if perms.Invoices.permanent_delete_invoices %}
+                                <div class="col-lg-6 dont-print">
+                                    <a href="{% url 'Invoices:super_delete' invoice.id %}"
+                                       class="btn btn-block btn-danger dont-print confirm-delete">
+                                        <i class="fa fa-times-circle"></i> حذف نهائي
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if perms.Invoices.restore_deleted_invoices %}
+                                <div class="col-lg-6 dont-print">
+                                    <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                                       class="btn btn-block btn-warning dont-print" data-toggle="modal" data-target="#sub_modal">
+                                        <i class="fa fa-undo"></i> استرجاع
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        {% if invoice.comment %}
+                            <div class="col-lg-12 dont-print">
+                                {{ invoice.comment }}
+                            </div>
+                        {% endif %}
+                        {% if invoice.internal_comment %}
+                            <div class="col-lg-12 dont-print">
+                                {{ invoice.internal_comment }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Income / Outcome Invoices -->
+    {% elif invoice.invoice_type == 11 or invoice.invoice_type == 12 or invoice.invoice_type == 19 or invoice.invoice_type == 24 %}
+        <div class="col-lg-3"></div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    {% if prev_invoice %}
+                        <a href="{% url 'Invoices:show_invoice' prev_invoice.id %}"
+                           class="btn btn-primary bg-primary dont-print">
+                            السابق
+                        </a>
+                    {% endif %}
+                    <a href="#"
+                       class="btn {% if invoice.saved %}btn-success{% else %}btn-warning{% endif %}{% if invoice.deleted %} btn-danger{% endif %}">
+                        {{ invoice }}
+                    </a>
+                    {% if next_invoice %}
+                        <a href="{% url 'Invoices:show_invoice' next_invoice.id %}"
+                           class="btn btn-primary bg-primary dont-print">
+                            التالي
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>التاريخ</td>
+                            <td>{{ invoice.date.astimezone.date.isoformat }}</td>
+                        </tr>
+                        {% if not invoice.invoice_type == 19 %}
+                            {% if  not invoice.invoice_type == 24 %}
+                                <tr>
+                                    <td>التصنيف</td>
+                                    <td>{{ invoice.spend_category }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endif %}
+                        {% if invoice.invoice_type in out_treasury_invoices or invoice.invoice_type == 19 or invoice.invoice_type == 24  %}
+                            {% if invoice.invoice_type == 24 %}
+                                <tr>
+                                    <td>المدين</td>
+                                    <td>
+                                        {% if invoice.from_treasury %}{{ invoice.from_treasury }}{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>الدائن</td>
+                                    <td>
+                                        {% if invoice.to_treasury %}{{ invoice.to_treasury }}{% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                            <tr>
+                                <td>من خزينة</td>
+                                <td>
+                                    {% if invoice.from_treasury %}{{ invoice.from_treasury }}{% endif %}
+                                </td>
+                            </tr>
+                            {% endif %} 
+                           
+                        {% elif invoice.invoice_type in in_treasury_invoices or invoice.invoice_type == 19 %}
+                            <tr>
+                                <td>إلي خزينة</td>
+                                <td>
+                                    {% if invoice.to_treasury %}{{ invoice.to_treasury }}{% endif %}
+                                </td>
+                            </tr>
+                        
+                        {% endif %}
+                        {% if invoice.invoice_type == 11 %}
+                            <tr>
+                                <td>مصروف</td>
+                                <td>{{ invoice.treasury_out }}</td>
+                            </tr>
+                        {% elif invoice.invoice_type == 12 %}
+                            <tr>
+                                <td>قبض</td>
+                                <td>{{ invoice.treasury_in }}</td>
+                            </tr>
+                        {% elif invoice.invoice_type == 19 or invoice.invoice_type == 24 %}
+                            <tr>
+                                <td>المبلغ</td>
+                                <td>{{ invoice.treasury_in }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td>ملاحظات</td>
+                            <td>{{ invoice.comment|linebreaks }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3"></div>
+        {% if not invoice.deleted %}
+            {% if not invoice.saved %}
+                <div class="col-lg-6">
+                    <a href="{% url 'Invoices:save_invoice' invoice.id %}"
+                       class="btn btn-block btn-success"
+                       data-toggle="modal"
+                       data-target="#sub_modal">
+                        <i class="fa fa-save"></i>
+                    </a>
+                </div>
+                <div class="col-lg-6">
+                    {% if perms.Invoices.delete_invoice %}
+                        <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                           class="btn btn-block btn-danger"
+                           data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="col-lg-6 dont-print">
+                    {% if perms.Invoices.undo_save_ionvoices %}
+                        <a href="{% url 'Invoices:edit_fast_invoice' invoice.id %}"
+                           class="btn btn-block btn-warning dont-print"
+                           data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6">
+                    {% if perms.Invoices.delete_invoice %}
+                        <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                           class="btn btn-block btn-danger"
+                           data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-12 dont-print">
+                    <a href="{% url 'Invoices:print_invoice' invoice.id %}"
+                       class="btn btn-block btn-success dont-print"
+                       target="_blank">
+                        <i class="fa fa-print"></i>
+                    </a>
+                </div>
+            {% endif %}
+        {% else %}
+            {% if perms.Invoices.permanent_delete_invoices %}
+                <div class="col-lg-6 dont-print">
+                    <a href="{% url 'Invoices:super_delete' invoice.id %}"
+                       class="btn btn-block btn-danger dont-print confirm-delete">
+                        <i class="fa fa-times-circle"></i> حذف نهائي
+                    </a>
+                </div>
+            {% endif %}
+            {% if perms.Invoices.restore_deleted_invoices %}
+                <div class="col-lg-6 dont-print">
+                    <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                       class="btn btn-block btn-warning dont-print">
+                        <i class="fa fa-undo"></i> استرجاع
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+
+        <!-- Capital Income / Outcome Invoices -->
+    {% elif invoice.invoice_type == 13 or invoice.invoice_type == 14 %}
+        <div class="col-lg-3"></div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    {% if prev_invoice %}
+                        <a href="{% url 'Invoices:show_invoice' prev_invoice.id %}"
+                           class="btn btn-primary bg-primary dont-print">
+                            السابق
+                        </a>
+                    {% endif %}
+                    <a href="#"
+                       class="btn {% if invoice.saved %}btn-success{% else %}btn-warning{% endif %}{% if invoice.deleted %} btn-danger{% endif %}">
+                        {{ invoice }}
+                    </a>
+                    {% if next_invoice %}
+                        <a href="{% url 'Invoices:show_invoice' next_invoice.id %}"
+                           class="btn btn-primary bg-primary dont-print">
+                            التالي
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>التاريخ</td>
+                            <td>{{ invoice.date.astimezone.date.isoformat }}</td>
+                        </tr>
+                        <tr>
+                            <td>الشريك</td>
+                            <td>{{ invoice.partner }}</td>
+                        </tr>
+                        <tr>
+                            <td>الخزينة</td>
+                            <td> {{ invoice.treasury }}</td>
+                        </tr>
+                        {% if invoice.invoice_type == 14 %}
+                            <tr>
+                                <td>سحب</td>
+                                <td>{{ invoice.treasury_out }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td>إضافة</td>
+                                <td>{{ invoice.treasury_in }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td>ملاحظات</td>
+                            <td>{{ invoice.comment|linebreaks }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3"></div>
+        {% if not invoice.deleted %}
+            {% if not invoice.saved %}
+                <div class="col-lg-6">
+                    <a href="{% url 'Invoices:save_invoice' invoice.id %}"
+                       class="btn btn-block btn-success"
+                       data-toggle="modal"
+                       data-target="#sub_modal">
+                        <i class="fa fa-save"></i>
+                    </a>
+                </div>
+                <div class="col-lg-6">
+                    {% if perms.Invoices.delete_invoice %}
+                        <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                           class="btn btn-block btn-danger"
+                           data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="col-lg-6 dont-print">
+                    {% if perms.Invoices.undo_save_ionvoices %}
+                        <a href="{% url 'Invoices:edit_fast_invoice' invoice.id %}"
+                           class="btn btn-block btn-warning dont-print"
+                           data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="col-lg-6">
+                    {% if perms.Invoices.delete_invoice %}
+                        <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                           class="btn btn-block btn-danger"
+                           data-toggle="modal"
+                           data-target="#sub_modal">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-12 dont-print">
+                    <a href="{% url 'Invoices:print_invoice' invoice.id %}"
+                       class="btn btn-block btn-success dont-print"
+                       target="_blank">
+                        <i class="fa fa-print"></i>
+                    </a>
+                </div>
+            {% endif %}
+        {% else %}
+            {% if perms.Invoices.permanent_delete_invoices %}
+                <div class="col-lg-6 dont-print">
+                    <a href="{% url 'Invoices:super_delete' invoice.id %}"
+                       class="btn btn-block btn-danger dont-print confirm-delete">
+                        <i class="fa fa-times-circle"></i> حذف نهائي
+                    </a>
+                </div>
+            {% endif %}
+            {% if perms.Invoices.restore_deleted_invoices %}
+                <div class="col-lg-6 dont-print">
+                    <a href="{% url 'Invoices:delete_invoice' invoice.id %}"
+                       class="btn btn-block btn-warning dont-print">
+                        <i class="fa fa-undo"></i> استرجاع
+                    </a>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+{% block js %}
+    <script>
+        $('#barcode').focus();
+        $('#id_after_discount').prop('readonly', true);
+        $('#id_total_price').prop('readonly', true);
+        {% if not perms.Invoices.edit_item_unit_price %}
+            $('#id_unit_price').prop('readonly', true);
+        {% endif %}
+        {% if not perms.Invoices.item_discount %}
+            $('#id_discount').prop('readonly', true);
+        {% endif %}
+        calculate();
+        $('#id_item').on('change', function (x) {
+            var product_id = this.value;
+            var invoice_id = {{ invoice.id }};
+            $('#barcode').val(this.value);
+            $.ajax({
+                url: "{% url 'Invoices:get_unit_price' invoice.id %}?product_id=" + product_id,
+                success: function (result) {
+                    $("#id_unit_price").val(result);
+                    calculate();
+                }
+            });
+        });
+        $('#id_unit_price').on('keyup change click', function () {
+            calculate();
+        });
+        $('#id_quantity').on('keyup change click', function () {
+            calculate();
+        });
+        $('#id_total_price').on('keyup change click', function () {
+            calculate();
+        });
+        $('#id_discount').on('keyup change click', function () {
+            calculate();
+        });
+        $('#barcode').on('keyup change click', function () {
+            $('#id_item').val(this.value);
+            var product_id = this.value;
+            var invoice_id = {{ invoice.id }};
+            $('#barcode').val(this.value);
+            $.ajax({
+                url: "{% url 'Invoices:get_unit_price' invoice.id %}?product_id=" + product_id,
+                success: function (result) {
+                    $("#id_unit_price").val(result);
+                    calculate();
+                }
+            });
+        });
+
+        function calculate() {
+            var price = $('#id_unit_price');
+            var quantity = $('#id_quantity');
+            var total_price = $('#id_total_price');
+            var discount = $('#id_discount');
+            var after_discount = $('#id_after_discount');
+            total_price.val(price.val() * quantity.val());
+            after_discount.val(total_price.val() - discount.val());
+            return true;
+        }
+    </script>
+{% endblock %}

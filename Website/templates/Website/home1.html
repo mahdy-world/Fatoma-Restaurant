@@ -1,0 +1,385 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Dawnberg Space</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <!-- <link href="{% static 'home1/assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'home1/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon"> -->
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Dosis:300,400,500,,600,700,700i|Lato:300,300i,400,400i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'home1/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'home1/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'home1/assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'home1/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'home1/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="{% static 'home1/assets/css/style.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="fixed-top">
+    <div class="container d-flex align-items-center justify-content-between">
+
+      <!-- <a href="" class="logo"><img src="{% static 'home1/assets/img/logo.png' %}" alt="" class="img-fluid"></a> -->
+      <!-- Uncomment below if you prefer to use text as a logo -->
+      <h1 class="logo"><a href="index.html">{% if setting.index_title %}{{ setting.index_title }}{% else %}{% endif %}</a></h1>
+
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link scrollto active" href="#hero">الرئيسية</a></li>
+          <li><a class="nav-link scrollto" href="#about">من نحن</a></li>
+          <li><a class="nav-link scrollto" href="#services">خدماتنا</a></li>
+          <li><a class="nav-link scrollto " href="#portfolio">منتجاتنا</a></li>
+          <li><a class="nav-link scrollto" href="#team">فريقنا</a></li>
+          <li><a class="nav-link scrollto" href="#contact">تواصل معنا</a></li>
+          <li><a class="nav-link scrollto" href="{% url 'Core:index' %}">تسجيل الدخول</a></li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav><!-- .navbar -->
+
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Hero Section ======= -->
+  <section id="hero" class="d-flex align-items-center">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 d-flex flex-column justify-content-center">
+          <h1>{% if setting.index_title %}{{ setting.index_title }}{% else %}عنوان الصفحة الرئيسية{% endif %}</h1>
+          <h2>{% if setting.index_text %}{{ setting.index_text|linebreaks }}{% else %}وصف الصفحة الرئيسية{% endif %}</h2>
+          <div><a href="#about" class="btn-get-started scrollto">تعرف إلينا</a></div>
+        </div>
+        <div class="col-lg-6 order-1 order-lg-2 hero-img">
+          <img src="{% if setting.index_img %}{{ setting.index_img.url }}{% else %}{% static 'home1/assets/img/hero-img.png' %}{% endif %}" class="img-fluid" alt="">
+        </div>
+      </div>
+    </div>
+
+  </section><!-- End Hero -->
+
+  <main id="main">
+
+    <!-- ======= About Section ======= -->
+    <section id="about" class="about">
+      <div class="container">
+
+        <div class="row">
+          <div class="col-xl-5 col-lg-6 d-flex justify-content-center video-box align-items-stretch position-relative">
+            <a href="{{ setting.about_vedio }}" class="glightbox play-btn mb-4"></a>
+          </div>
+
+          <div class="col-xl-7 col-lg-6 icon-boxes d-flex flex-column align-items-stretch justify-content-center py-5 px-lg-5">
+            <h3>من نحن</h3>
+            <p>{% if setting.about_text %}{{ setting.about_text }}{% else %}وصف من نحن{% endif %}</p>
+
+            {% for item in AboutItems %}
+            <div class="icon-box">
+              <div class="icon"><i class="bx bx-star"></i></div>
+              <h4 class="title"><a href="">{{ item.title }}</a></h4>
+              <p class="description">{{ item.description }}</p>
+            </div>
+            {% endfor %}
+
+          </div>
+        </div>
+
+      </div>
+    </section><!-- End About Section -->
+
+    <!-- ======= Counts Section ======= -->
+    <section id="counts" class="counts">
+      <div class="container">
+
+        <div class="text-center title">
+          <h3>{% if setting.about_statistics_title %}{{ setting.about_statistics_title }}{% else %}عنوان إحصائيات من نحن {% endif %}</h3>
+          <p>{% if setting.about_statistics_text %}{{ setting.about_statistics_text }}{% else %}وصف إحصائيات من نحن{% endif %}</p>
+        </div>
+
+        <div class="row counters position-relative">
+
+          {% for item in StatisticsItems %}
+          <div class="col-lg-3 col-6 text-center">
+            <span data-purecounter-start="0" data-purecounter-end="{{ item.number }}" data-purecounter-duration="1" class="purecounter"></span>
+            <p>{{ item.title }}</p>
+          </div>
+          {% endfor %}
+
+
+        </div>
+
+      </div>
+    </section><!-- End Counts Section -->
+
+    <!-- ======= Services Section ======= -->
+    <section id="services" class="services section-bg">
+      <div class="container">
+
+        <div class="section-title">
+          <h2>خدماتنا</h2>
+          <p>{% if setting.service_text %}{{ setting.service_text }}{% else %}وصف خدماتنا  {% endif %}</p>
+        </div>
+
+        
+        <div class="row">
+          {% for item in ServiceItems %}
+          
+          <div class="col-lg-4 col-md-6" data-wow-delay="0.1s">
+            <div class="icon-box">
+              <div class="icon"><i class="bi bi-credit-card-2-front" style="color:#41cf2e;"></i></div>
+              <h4 class="title"><a href="">{{ item.title }}</a></h4>
+              <p class="description">{{ item.description }}</p>
+            </div>
+          </div>
+
+          {% endfor %}
+        </div>
+
+      </div>
+    </section><!-- End Services Section -->
+
+    <!-- ======= Portfolio Section ======= -->
+    <section id="portfolio" class="portfolio">
+      <div class="container">
+
+        <div class="section-title">
+          <h2>منتجاتنا</h2>
+          <p>{% if setting.product_text %}{{ setting.product_text }}{% else %}وصف منتجاتنا{% endif %}</p>
+        </div>
+        <div class="row portfolio-container">
+
+          {% for item in ProductItems %}
+          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
+            <div class="portfolio-wrap">
+              <img src="{{ item.image.url }}" class="img-fluid" alt="">
+              <div class="portfolio-info">
+                <h4>{{ item.title }}</h4>
+                <div class="portfolio-links">
+                  <a href="{{ item.image.url }}" data-gallery="portfolioGallery" class="portfolio-lightbox" title="App 1"><i class="bx bx-plus"></i></a>
+                  <!-- <a href="portfolio-details.html" title="More Details"><i class="bx bx-link"></i></a> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+
+      </div>
+    </section><!-- End Portfolio Section -->
+
+
+    <!-- ======= Team Section ======= -->
+    <section id="team" class="team section-bg">
+      <div class="container">
+
+        <div class="section-title">
+          <h2>فريقنا</h2>
+          <p>{% if setting.team_text %}{{ setting.team_text }}{% else %}وصف فريقنا{% endif %}</p>
+        </div>
+
+        <div class="row">
+
+          {% for item in TeamItems %}
+          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
+            <div class="member">
+              <div class="member-img">
+                <img src="{{ item.image.url }}" class="img-fluid" alt="">
+                <div class="social">
+                  <a href="{{ item.twitter }}"><i class="bi bi-twitter"></i></a>
+                  <a href="{{ item.facebook }}"><i class="bi bi-facebook"></i></a>
+                  <a href="{{ item.Instgram }}"><i class="bi bi-instagram"></i></a>
+                  <a href="{{ item.linkdin }}"><i class="bi bi-linkedin"></i></a>
+                </div>
+              </div>
+              <div class="member-info">
+                <h4>{{ item.name }}</h4>
+                <span>{{ item.position }}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </section><!-- End Team Section -->
+
+    <!-- ======= Contact Section ======= -->
+    <section id="contact" class="contact">
+      <div class="container">
+
+        <div class="section-title">
+          <h2>تواصل معنا</h2>
+          <p>{% if setting.call_text %}{{ setting.call_text }}{% else %}وصف تواصل معنا{% endif %}</p>
+        </div>
+
+        <div>
+          <iframe style="border:0; width: 100%; height: 270px;" 
+          src="{% if setting.map %}{{ setting.map }}{% else %}https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d27347.642553472673!2d31.365330063013953!3d31.041421737853007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14f79db7a9053547%3A0xf8dab3bbed766c97!2sMansoura%2C%20Mansoura%20Qism%202%2C%20Mansoura%2C%20Dakahlia%20Governorate%2C%20Egypt!5e0!3m2!1sen!2sbg!4v1626336763811!5m2!1sen!2sbg{% endif %}"
+          frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <div class="row mt-5">
+
+          <div class="col-lg-4">
+            <div class="info">
+              <div class="address">
+                <i class="bi bi-geo-alt"></i>
+                <h4>الموقع</h4>
+                <p>{% if setting.address %}{{ setting.address }}{% else %}{% endif %}</p>
+              </div>
+
+              <div class="email">
+                <i class="bi bi-envelope"></i>
+                <h4>الإيميل</h4>
+                <p>{% if setting.email %}{{ setting.email }}{% else %}{% endif %}</p>
+              </div>
+
+              <div class="phone">
+                <i class="bi bi-phone"></i>
+                <h4>الهاتف</h4>
+                <p>{% if setting.phone %}{{ setting.phone }}{% else %}{% endif %}</p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="col-lg-8 mt-5 mt-lg-0">
+
+            <form action="" method="post" role="form" class="php-email-form">
+              <div class="row">
+                <div class="col-md-6 form-group">
+                  <input type="text" name="name" class="form-control" id="name" placeholder="الاسم" required>
+                </div>
+                <div class="col-md-6 form-group mt-3 mt-md-0">
+                  <input type="email" class="form-control" name="email" id="email" placeholder="الايميل" required>
+                </div>
+              </div>
+              <div class="form-group mt-3">
+                <input type="text" class="form-control" name="subject" id="subject" placeholder="رقم الهاتف" required>
+              </div>
+              <div class="form-group mt-3">
+                <input type="text" class="form-control" name="subject" id="subject" placeholder="عنوان الرسالة" required>
+              </div>
+              <div class="form-group mt-3">
+                <textarea class="form-control" name="message" rows="5" placeholder="الرسالة" required></textarea>
+              </div>
+              <div class="my-3">
+                <div class="loading">Loading</div>
+                <div class="error-message"></div>
+                <div class="sent-message">تم إرسال الرسالة , سيتم التواصل في اقرب وقت</div>
+              </div>
+              <div class="text-center"><button type="submit"> ارسال الرسالة</button></div>
+            </form>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section><!-- End Contact Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <!-- <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-3 col-md-6 footer-contact">
+            <h3>Butterfly</h3>
+            <p>
+              A108 Adam Street <br>
+              New York, NY 535022<br>
+              United States <br><br>
+              <strong>Phone:</strong> +1 5589 55488 55<br>
+              <strong>Email:</strong> info@example.com<br>
+            </p>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Useful Links</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Home</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">About us</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Services</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Terms of service</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="#">Privacy policy</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Our Services</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i>Web Design</li>
+              <li><i class="bx bx-chevron-right"></i>Web Development</li>
+              <li><i class="bx bx-chevron-right"></i>Product Management</li>
+              <li><i class="bx bx-chevron-right"></i>Marketing</li>
+              <li><i class="bx bx-chevron-right"></i>Graphic Design</li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 footer-links">
+            <h4>Our Social Networks</h4>
+            <p>Cras fermentum odio eu feugiat lide par naso tierra videa magna derita valies</p>
+            <div class="social-links mt-3">
+              <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
+              <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
+              <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
+              <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div> -->
+
+    <div class="container py-4">
+      <div class="copyright">
+        &copy; Copyright <strong><span>Dawnberg Space</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+        <!-- All the links in the footer should remain intact. -->
+        <!-- You can delete the links only if you purchased the pro version. -->
+        <!-- Licensing information: https://bootstrapmade.com/license/ -->
+        <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/butterfly-free-bootstrap-theme/ -->
+        <a href="https://bootstrapmade.com/">2021</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'home1/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'home1/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'home1/assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'home1/assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'home1/assets/vendor/purecounter/purecounter.js' %}"></script>
+  <script src="{% static 'home1/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Template Main JS File -->
+  <script src="{% static 'home1/assets/js/main.js' %}"></script>
+
+</body>
+
+</html>

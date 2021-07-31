@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        {% if perms.Products.add_tax  %}
+        <a href="{% url 'Products:TaxCreate' %}" class="btn btn-success btn-block" data-toggle="modal"
+           data-target="#action_modal">
+            <i class="fa fa-plus-circle"></i>
+            إضافة
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-th-list"></i>
+                الضرائب
+                {% if perms.Products.download_tax_data %}
+                    <a href="{% url 'Products:TaxXls' %}" class="btn btn-outline-danger btn-sm" style="float: left;"> 
+                        <i class="fas fa-file-excel"></i>
+                            تنزيل البيانات
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>#</td>
+                            <td>الاسم</td>
+                            <td>النوع</td>
+                            <td>القيمة</td>
+                            <td>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <form action="#" method="get">
+                            <tr>
+                                <td>
+                                    <input type="number" class="form-control input-xs" name="id">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="name">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="type">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="value">
+                                </td>
+                                <td>
+                                    <button class="btn btn-block btn bg-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </form>
+                        {% for x in object_list %}
+                            <tr>
+                                <td>{{ x.id }}</td>
+                                <td>{{ x.name }}</td>
+                                <td>{{ x.get_type_display }}</td>
+                                <td>{{ x.value }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        {% if perms.Products.edit_tax  %}
+                                        <a href="{% url 'Products:TaxUpdate' x.id %}" class="btn btn-info"
+                                           title="تعديل" data-toggle="modal" data-target="#action_modal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if perms.Products.delete_tax  %}
+                                        <a href="{% url 'Products:TaxDelete' x.id %}" class="btn btn-danger"
+                                           title="حذف">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if is_paginated %}
+                <div class="card-footer">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&laquo;</span></li>
+                            {% endif %}
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="active page-item"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

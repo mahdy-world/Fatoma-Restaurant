@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block body %}
+    <form method="post" action="{{ action_link }}">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">{{ object.name }}</div>
+                    <div class="card-body">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input name="url" type="hidden">
+                    </div>
+                    <div class="card-footer">
+                        <button onclick="window.history.back();" class="btn btn-success">
+                            <i class="fa fa-undo"></i>
+                            عودة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+{% block js %}
+<script>
+    $('input').prop("disabled", true);
+    $('select').prop("disabled", true);
+</script>
+{% endblock %}

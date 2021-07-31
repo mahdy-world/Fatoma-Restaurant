@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-lg-12">
+        {% if perms.Products.add_product %}
+        <a href="{% url 'Products:ProductCreate' %}" class="btn btn-success btn-block" data-toggle="modal"
+           data-target="#sub_modal">
+            <i class="fa fa-plus-circle"></i>
+            إضافة
+        </a>
+        {% endif %}
+    </div>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-th-list"></i>
+                الأصناف
+                {% if perms.Products.download_product_data %}
+                    <a href="{% url 'Products:ProductXls' %}" class="btn btn-outline-danger btn-sm" style="float: left;"> 
+                        <i class="fas fa-file-excel"></i>
+                            تنزيل البيانات
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <td>#</td>
+                            <td>الصورة</td>
+                            <td>الاسم</td>
+                            <td>الوصف</td>
+                            <td>المجموعة الرئيسية</td>
+                            <td>المجموعة الفرعية</td>
+                            <td>الشركة المنتجة</td>
+                            <td>البراند</td>
+                            <td>سعر الشراء</td>
+                            <td>سعر التكلفة</td>
+                            <td>سعر البيع</td>
+                            <td>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <form action="#" method="get">
+                            <tr>
+                                <td>
+                                    <input type="number" class="form-control input-xs" name="id">
+                                </td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="name">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="description">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="main_category">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="sub_category">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="manufacture">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control input-xs" name="brand">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control input-xs" name="purchase_price">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control input-xs" name="cost_price">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control input-xs" name="sell_price">
+                                </td>
+                                <td>
+                                    <button class="btn btn-block btn bg-primary">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </form>
+                        {% for x in object_list %}
+                            <tr>
+                                <td>{{ x.id }}</td>
+                                <td>{% if x.image %}<img src="{{ x.image.url }}" height='50px' width="50px">{% endif %}
+                                </td>
+                                <td>{{ x.name }}</td>
+                                <td>{{ x.description|linebreaks }}</td>
+                                <td>{{ x.sub_category.main_category }}</td>
+                                <td>{{ x.sub_category.name }}</td>
+                                <td>{{ x.manufacture }}</td>
+                                <td>{{ x.brand }}</td>
+                                <td>{{ x.purchase_price }}</td>
+                                <td>{{ x.cost_price }}</td>
+                                <td>{{ x.sell_price }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        {% if perms.Products.access_product_detail %}
+                                        <a href="{% url 'Products:ProductCard' x.id %}" class="btn btn-success"
+                                           title="عرض" >
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if perms.Products.print_product_label %}
+                                        <a href="{% url 'Barcode:print_barcode' %}?barcode={{ x.id }}&quantity=0&par1={{ x.name }}&par2={{ x.sell_price|floatformat }}"
+                                           class="btn btn-primary"
+                                           title="طباعة ملصقات" target="_blank">
+                                            <i class="fas fa-barcode"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if perms.Products.edit_product %}
+                                        <a href="{% url 'Products:ProductUpdate' x.id %}" class="btn btn-info"
+                                           title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        {% endif %}
+                                        {% if perms.Products.delete_product %}
+                                        <a href="{% url 'Products:ProductDelete' x.id %}" class="btn btn-danger"
+                                           title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% if is_paginated %}
+                <div class="card-footer">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&laquo;</span></li>
+                            {% endif %}
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="active page-item"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

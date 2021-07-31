@@ -1,0 +1,46 @@
+{% extends 'chat.html' %}
+{% block hide %}{% endblock %}
+{% block messages %}
+{% load static %}
+    {% for message in messages %}
+    {% if message.sender == request.user %}
+
+    <div class="direct-chat-msg right">
+        <div class="direct-chat-infos clearfix">
+          <span class="direct-chat-name float-right">you</span>
+          <span class="direct-chat-timestamp float-left">{{message.timestamp}}</span>
+        </div>
+        <!-- /.direct-chat-infos -->
+        <img class="direct-chat-img" src="{% static 'AdminLTE/dist/img/user1-128x128.jpg' %}" alt="Message User Image">
+        <!-- /.direct-chat-img -->
+        <div class="direct-chat-text">
+            {{ message }}
+        </div>
+        <!-- /.direct-chat-text -->
+      </div>
+    
+    {% else %}
+
+      <div class="direct-chat-msg">
+        <div class="direct-chat-infos clearfix">
+          <span class="direct-chat-name float-left">{{ message.sender }}</span>
+          <span class="direct-chat-timestamp float-right">{{message.timestamp}}</span>
+        </div>
+        <!-- /.direct-chat-infos -->
+        <img class="direct-chat-img" src="{% static 'AdminLTE/dist/img/user1-128x128.jpg' %}" alt="Message User Image">
+        <!-- /.direct-chat-img -->
+        <div class="direct-chat-text">
+          {{ message }}
+        </div>
+        <!-- /.direct-chat-text -->
+      </div>
+    {% endif %}
+    {% endfor %}
+<script>
+$(function () {
+    $('#user{{ receiver.id }}').addClass('active');
+    //Call receive function each 1 seconds to check for new messages in the database
+    setInterval(receive,1000)
+})
+</script>
+{% endblock %}

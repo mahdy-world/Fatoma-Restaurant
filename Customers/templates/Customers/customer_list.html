@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block body %}
+    {% if perms.Customers.add_customer %}
+        <div class="col-lg-12">
+            <a href="{% url 'Customers:CustomerCreate' %}" class="btn btn-success btn-block" data-toggle="modal"
+               data-target="#sub_modal">
+                <i class="fa fa-plus-circle"></i>
+                إضافة
+            </a>
+        </div>
+    {% endif %}
+    {% if perms.Customers.access_customer_menu %}
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-th-list"></i>
+                    العملاء والموردين
+                    {% if perms.Customers.download_customer_data %}
+                    <a href="{% url 'Customers:CustomerXls' %}" class="btn btn-outline-danger btn-sm" style="float: left;"> 
+                        <i class="fas fa-file-excel"></i>
+                            تنزيل البيانات
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card-body table-responsive">
+
+                    <form method="get" action="#">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <td>
+                                    #
+                                    <input type="number" class="form-control input-xs" name="id">
+                                </td>
+                                <td>
+                                    الاسم
+                                    <input type="text" class="form-control input-xs" name="name">
+                                </td>
+                                {% if perms.Customers.view_customer_balance %}
+                                    <td>الرصيد</td>
+                                {% endif %}
+                                <td>
+                                    المهنة
+                                    <input type="text" class="form-control input-xs" name="job">
+                                </td>
+                                <td>
+                                    الشريحة
+                                </td>
+                                <td>
+                                    التصنيف
+                                    <select name='group'>
+                                        <option>اختيار التصنيف</option>
+                                        {% for g in groups %}
+                                        <option value="{{ g.id }}">{{ g.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    إضيف بواسطة
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-info btn-block"><i class="fa fa-search"></i> </button>
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for x in object_list %}
+                                <tr>
+                                    <td>{{ x.id }}</td>
+                                    <td>{{ x.name }}</td>
+
+                                    {% if perms.Customers.view_customer_balance %}
+                                        <td>{{ x.balance }}</td>
+                                    {% endif %}
+                                    <td>{{ x.job }}</td>
+                                    <td>{% if x.category == None %}لم يتم اختيار شريحة {% else %}{{ x.category }}{% endif %}</td>
+                                    <td>{% if x.group == None %} لم يتم اختيار تصنيف{% else %}{{ x.group }} {% endif %}</td>
+                                    <td>{{ x.added_by }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            {% if perms.Customers.view_customer %}
+                                                <a href="{% url 'Customers:CustomerDetail' x.id %}"
+                                                   class="btn btn-primary"
+                                                   title="عرض">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if perms.Customers.edit_customer %}
+                                                <a href="{% url 'Customers:CustomerUpdate' x.id %}"
+                                                   class="btn btn-info"
+                                                   title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if perms.Invoices.add_customer_income %}
+                                                <a href="{% url 'Invoices:customer_income' %}?customer={{ x.id }}"
+                                                   class="btn btn-success"
+                                                   title="قبض سداد" data-toggle="modal" data-target="#sub_modal">
+                                                    <i class="fa fa-plus-circle"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if perms.Invoices.add_customer_outcome %}
+                                                <a href="{% url 'Invoices:customer_outcome' %}?customer={{ x.id }}"
+                                                   class="btn btn-warning"
+                                                   title="صرف سداد" data-toggle="modal" data-target="#sub_modal">
+                                                    <i class="fa fa-minus-circle"></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if perms.Customers.delete_customer %}
+                                                <a href="{% url 'Customers:CustomerDelete' x.id %}"
+                                                   class="btn btn-danger"
+                                                   title="حذف" data-toggle="modal" data-target="#sub_modal">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+            {% if is_paginated %}
+                <div class="card-footer">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&laquo;</span></li>
+                            {% endif %}
+                            {% for i in paginator.page_range %}
+                                {% if page_obj.number == i %}
+                                    <li class="active page-item"><span class="page-link">{{ i }} <span
+                                            class="sr-only">(current)</span></span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?page={{ page_obj.next_page_number }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="disabled page-item"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+        </div>
+    {% endif %}
+{% endblock %}

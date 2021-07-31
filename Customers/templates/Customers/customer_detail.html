@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="col-lg-12">
+    <div class="btn-group btn-block">
+        <a class="btn btn-app" href="{% url 'Customers:CustomerCalls' object.id %}">
+            {% if object.customercall_set.count > 0 %}
+            <span class="badge bg-purple">{{ object.customercall_set.count }}</span>
+            {% endif %}
+            <i class="fas fa-mobile"></i>المكالمات
+        </a>
+        <a class="btn btn-app" href="{% url 'Customers:CustomerInvoices' object.id %}?type=7">
+            {% if object.quotations.count > 0 %}
+                <span class="badge bg-purple">{{ object.quotations.count }}</span>
+            {% endif %}
+            <i class="fas fa-edit"></i> عروض الأسعار
+        </a>
+        <a class="btn btn-app" href="{% url 'Customers:CustomerInvoices' object.id %}?type=1">
+            {% if object.sales_invoices.count > 0 %}
+                <span class="badge bg-purple">{{ object.sales_invoices.count }}</span>
+            {% endif %}
+            <i class="fas fa-list-alt"></i> فواتير المبيعات
+        </a>
+    </div>
+</div>
+<div class="col-md-4">
+    <a class="btn btn-success btn-block" href="{% url 'Customers:add_call' object.id %}" data-toggle="modal"
+       data-target="#sub_modal">
+        <i class="fa fa-mobile"></i>
+    </a>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                بيانات العميل / المورد
+                <a href="{% url 'Customers:CustomerUpdate' object.id %}" data-toggle="modal"
+                   data-target="#sub_modal"
+                   class="btn btn-success">
+                    <i class="fa fa-edit"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <h5>{{ object.name }}</h5>
+            {% if object.job %}
+                <small>{{ object.job }}</small>{% endif %}
+            {% if object.phone %}
+                <a href="tel:{{ object.phone }}" class="btn btn-info">
+                    <i class="fa fa-mobile"></i>
+                </a>
+                <a href="https://wa.me/2{{ object.phone }}" class="btn btn-success" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            {% endif %}
+            {% if object.name %}
+                <a href="https://m.me/{{ object.facebook_account }}" class="btn btn-primary" target="_blank">
+                    <i class="fab fa-facebook-messenger"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                الخط الزمني
+            </div>
+        </div>
+        <div class="card-body">
+
+            <!-- The time line -->
+            <div class="timeline">
+                <!-- timeline time label -->
+                {% regroup object.customerhistory_set.all by added_at.date.isoformat as object_list %}
+                {% for x in object_list %}
+                    <div class="time-label">
+                        <span class="bg-red">{{ x.grouper }}</span>
+                    </div>
+                    <!-- /.timeline-label -->
+                    {% for y in x.list %}
+                        <!-- timeline item -->
+                        {% if y.history_type == 1 %}
+                            <div>
+                                <i class="fas fa-user-plus bg-green"></i>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fas fa-clock"></i> {{ y.added_at.time }}</span>
+                                    <h3 class="timeline-header no-border">
+
+                                        تم إضافة العميل
+                                        <a href="#">{{ y.customer.name }}</a>
+                                        بواسطة
+                                        <a href="#">{{ y.added_by }}</a>
+                                    </h3>
+                                </div>
+                            </div>
+                        {% elif y.history_type == 2 %}
+                            <div>
+                                <i class="fas fa-phone bg-warning"></i>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fas fa-clock"></i> {{ y.added_at.time }}</span>
+                                    <h3 class="timeline-header no-border">
+                                        تم
+                                        <a href="{% url 'Customers:CallDetail' y.call.id %}" data-target="#sub_modal" data-toggle="modal">
+                                            {{ y.get_history_type_display }}
+
+                                        </a>
+                                        بواسطة
+                                        <a href="#">{{ y.added_by }}</a>
+                                    </h3>
+                                </div>
+                            </div>
+                        {% elif y.history_type == 4 %}
+                            <div>
+                                <i class="fas fa-list-alt bg-info"></i>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fas fa-clock"></i> {{ y.added_at.time }}</span>
+                                    <h3 class="timeline-header no-border">
+
+                                        تم إضافة
+                                        <a href="#">
+                                            {{ y.get_history_type_display }}
+
+                                            {{ y.ivnoice_id }}
+                                        </a>
+                                        بواسطة
+                                        <a href="#">{{ y.added_by }}</a>
+                                    </h3>
+                                </div>
+                            </div>
+
+                        {% endif %}
+                        <!-- END timeline item -->
+                    {% endfor %}
+                {% endfor %}
+                <!-- END timeline item -->
+                <div>
+                    <i class="fas fa-clock bg-gray"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<div class="col-md-4">
+    {% if perms.Customers.access_address_menu %}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    عنواين العميل / المورد
+                </div>
+                <span class="float-left dont-print">
+                    {% if perms.Customers.add_address %}
+                    <a href="{% url 'Customers:AddressCreate' object.id %}" class="btn-sm btn-success" title="إضافة"
+                    data-toggle="modal" data-target="#sub_modal">
+                        <i class="fa fa-plus-circle"></i>
+                    </a>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+
+                <table class="table ">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">الدولة</th>
+                        <th scope="col">المحافظة</th>
+                        <th scope="col">المنطقة</th>
+                        <th scope="col">التحكم</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for x in address %}
+                    <tr>
+                        <th scope="row">{{ x.id }}</th>
+                        <td>{{ x.country }}</td>
+                        <td>{{ x.governorate }}</td>
+                        <td>{{ x.area }}</td>
+                        <td>
+                            {% if perms.Customers.edit_address %}
+                            <a href="{% url 'Customers:AddressUpdate' x.id %}" class="btn-sm btn-info"
+                                title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            {% endif %}
+                            {% if perms.Customers.delete_address %}
+                            <a href="{% url 'Customers:AddressDelete' x.id %}"
+                                class="btn-sm btn-danger" title="حذف" >
+                                <i class="fa fa-trash"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                ارقام العميل / المورد
+            </div>
+            <span class="float-left dont-print">
+                {% if perms.Customers.add_address %}
+                <a href="{% url 'Customers:PhoneCreate' object.id %}" class="btn-sm btn-success" title="إضافة"
+                data-toggle="modal" data-target="#sub_modal">
+                    <i class="fa fa-plus-circle"></i>
+                </a>
+                {% endif %}
+            </span>
+        </div>
+        <div class="card-body">
+
+            <table class="table ">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">الرقم</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for x in phone %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ x.phone }}</td>
+
+                    <td>
+                        {% if perms.Customers.edit_address %}
+                        <a href="{% url 'Customers:PhoneUpdate' x.id %}" class="btn-sm btn-info"
+                            title="تعديل" data-toggle="modal" data-target="#sub_modal">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        {% endif %}
+                        {% if perms.Customers.delete_address %}
+                        <a href="{% url 'Customers:PhoneDelete' x.id %}"
+                            class="btn-sm btn-danger" title="حذف" >
+                            <i class="fa fa-trash"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
